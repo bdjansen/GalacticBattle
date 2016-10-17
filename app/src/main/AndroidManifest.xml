@@ -15,6 +15,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".OptionsActivity"
+            android:label="OptionsActivity" >
+        </activity>
+        <activity
+            android:name=".GameActivity"
+            android:label="GameActivity" >
+        </activity>
     </application>
 
 </manifest>

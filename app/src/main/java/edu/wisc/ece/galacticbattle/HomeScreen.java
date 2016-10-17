@@ -13,14 +13,14 @@ public class HomeScreen extends AppCompatActivity {
         setContentView(R.layout.activity_home_screen);
     }
 
-    public void searchPlayers(View view) {
+    public void searchPlayers(View v) {
         // Go back to the main activity
         Intent mIntent = new Intent(HomeScreen.this,
                 GameActivity.class);
         startActivity(mIntent);
     }
 
-    public void openOptions(View view) {
+    public void openOptions(View v) {
         // Go back to the main activity
         Intent mIntent = new Intent(HomeScreen.this,
                 OptionsActivity.class);

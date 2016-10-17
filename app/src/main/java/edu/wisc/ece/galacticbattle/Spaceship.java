@@ -16,6 +16,20 @@ public class Spaceship {
         this.x = x;
     }
 
+    public boolean isHit(Bullet bullet)
+    {
+        int bulletX = bullet.getX();
+        int bulletY = bullet.getY();
+        int range = 5;
+
+        if ((Math.abs(x - bulletX) <= range) && (Math.abs(y - bulletY) <= range))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public int getX(){
         return x;
     }

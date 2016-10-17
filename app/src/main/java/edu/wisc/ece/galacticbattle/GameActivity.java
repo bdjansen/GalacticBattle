@@ -14,11 +14,13 @@ public class GameActivity extends AppCompatActivity {
     private Spaceship enemyShip = new Spaceship(0, -100);
 
     private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_screen);
+        setContentView(R.layout.activity_game_screen);
     }
+
 
     private boolean shipHit(Spaceship ship)
     {

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="209dp"
+        android:layout_height="218dp"
+        android:scaleType="fitCenter"
+        android:id="@+id/enemyShip"
+        android:src="@drawable/enemy"
+        android:layout_gravity="top|center_horizontal" />
+
+    <ImageView
+        android:layout_width="209dp"
+        android:layout_height="218dp"
+        android:scaleType="fitCenter"
+        android:id="@+id/myShip"
+        android:src="@drawable/spaceship"
+        android:layout_gravity="bottom" />
+
+</LinearLayout>

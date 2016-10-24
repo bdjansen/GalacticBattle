@@ -1,6 +1,7 @@
 package edu.wisc.ece.galacticbattle;
 
 import android.content.SharedPreferences;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
@@ -17,6 +18,12 @@ public class OptionsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_options);
+        ActionBar bar = getSupportActionBar();
+        try {
+            bar.hide();
+        } catch (java.lang.NullPointerException e) {
+
+        }
     }
 
     private void loadUserData() {

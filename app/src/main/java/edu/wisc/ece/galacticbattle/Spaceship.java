@@ -21,14 +21,12 @@ public class Spaceship {
         this.x = x;
     }
 
-    public boolean isHit(Bullet bullet)
+    public boolean isHit(Bullet b)
     {
-        int bulletX = bullet.getX();
-        int bulletY = bullet.getY();
-        int range = 5;
-
-        if ((Math.abs(x - bulletX) <= range) && (Math.abs(y - bulletY) <= range))
-        {
+        if(b.getX() > x - widthRadius - b.getWidthRadius()
+                && b.getX() < x + widthRadius + b.getWidthRadius()
+                && b.getY() > y - heightRadius - b.getHeightRadius()
+                && b.getY() < y + heightRadius + b.getHeightRadius()){
             return true;
         }
 
@@ -49,19 +47,5 @@ public class Spaceship {
 
     public boolean isAlive() {
         return lives > 0;
-    }
-
-    public boolean collisionDetection(ArrayList<Bullet> bullets) {
-        for (int i = 0; i < bullets.size(); i++) {
-            Bullet b = bullets.get(i);
-            if(b.getX() > x - widthRadius - b.getWidthRadius()
-                    && b.getX() < x + widthRadius + b.getWidthRadius()
-                    && b.getY() > y - heightRadius - b.getHeightRadius()
-                    && b.getY() < y + heightRadius + b.getHeightRadius()){
-                bullets.remove(i);
-                return true;
-            }
-        }
-        return false;
     }
 }

@@ -34,4 +34,9 @@ public class GameActivity extends AppCompatActivity {
 
         return false;
     }
+
+    @Override
+    public void onBackPressed() {
+
+    }
 }

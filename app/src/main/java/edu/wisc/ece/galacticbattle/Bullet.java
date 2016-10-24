@@ -6,10 +6,14 @@ package edu.wisc.ece.galacticbattle;
 public class Bullet {
     private int x;
     private int y;
+    private int widthRadius;
+    private int heightRadius;
 
-    public Bullet(int x, int y) {
+    public Bullet(int x, int y, int halfWidth, int halfHeight) {
         this.x = x;
         this.y = y;
+        this.widthRadius = halfWidth;
+        this.heightRadius = halfHeight;
     }
 
     public int setY() {
@@ -23,4 +27,8 @@ public class Bullet {
     public int getY() {
         return y;
     }
+
+    public int getWidthRadius() { return widthRadius; }
+
+    public int getHeightRadius() { return heightRadius; }
 }

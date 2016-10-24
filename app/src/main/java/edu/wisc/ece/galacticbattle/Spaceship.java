@@ -1,11 +1,16 @@
 package edu.wisc.ece.galacticbattle;
 
+import java.util.ArrayList;
+
 /**
  * Created by Blake on 10/17/2016.
  */
 public class Spaceship {
     private int x;
     private int y;
+    private int widthRadius;
+    private int heightRadius;
+    private int lives = 3;
 
     public Spaceship(int x, int y) {
         this.x = x;
@@ -16,14 +21,12 @@ public class Spaceship {
         this.x = x;
     }
 
-    public boolean isHit(Bullet bullet)
+    public boolean isHit(Bullet b)
     {
-        int bulletX = bullet.getX();
-        int bulletY = bullet.getY();
-        int range = 5;
-
-        if ((Math.abs(x - bulletX) <= range) && (Math.abs(y - bulletY) <= range))
-        {
+        if(b.getX() > x - widthRadius - b.getWidthRadius()
+                && b.getX() < x + widthRadius + b.getWidthRadius()
+                && b.getY() > y - heightRadius - b.getHeightRadius()
+                && b.getY() < y + heightRadius + b.getHeightRadius()){
             return true;
         }
 
@@ -36,5 +39,13 @@ public class Spaceship {
 
     public int getY() {
         return y;
+    }
+
+    public int getWidthRadius() { return widthRadius; }
+
+    public int getHeightRadius() { return heightRadius; }
+
+    public boolean isAlive() {
+        return lives > 0;
     }
 }

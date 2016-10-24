@@ -3,4 +3,6 @@
     <string name="preference_name">my_shared_preferences</string>
     <string name="preference_key_profile_colors">profile_colors</string>
     <string name="preference_key_profile_speed">profile_speed</string>
+    <string name="ship_color_descriptor">Ship Color</string>
+    <string name="ship_speed_descriptor">Turn Speed</string>
 </resources>

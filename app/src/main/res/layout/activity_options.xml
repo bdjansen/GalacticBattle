@@ -1,6 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/changeColorText"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:textAlignment="center"
+        android:textSize="50dp"
+        android:text="@string/ship_color_descriptor"/>
+
+    <RadioGroup
+        android:id="@+id/colorRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:orientation="horizontal"
+        android:textAlignment="center"
+        android:layout_below="@id/changeColorText"
+        android:layout_marginBottom="10dp">
+
+        <RadioButton
+            android:id="@+id/shipColor1"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:drawableRight="@drawable/minispaceship"/>
+
+        <RadioButton
+            android:id="@+id/shipColor2"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:drawableRight="@drawable/minispaceship"/>
+
+        <RadioButton
+            android:id="@+id/shipColor3"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:drawableRight="@drawable/minispaceship"
+            />
+
+    </RadioGroup>
+
+    <View
+        android:layout_below="@id/colorRadioGroup"
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#000000" />
+
+    <TextView
+        android:id="@+id/changeSpeedText"
+        android:layout_below="@id/colorRadioGroup"
+        android:layout_marginTop="7dp"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:textAlignment="center"
+        android:textSize="50dp"
+        android:text="@string/ship_speed_descriptor"/>
+
+    <SeekBar
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_below="@id/changeSpeedText"
+        android:thumbTint="@color/blueThumb"
+        />
+
+</RelativeLayout>

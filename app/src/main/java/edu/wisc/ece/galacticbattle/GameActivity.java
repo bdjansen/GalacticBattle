@@ -19,11 +19,8 @@ import java.util.ArrayList;
  */
 
 public class GameActivity extends AppCompatActivity implements SensorEventListener {
-    private Spaceship myShip = new Spaceship(0, 100);
-    private Spaceship enemyShip = new Spaceship(0, -100);
-
-    private View myShipV;
-    private View enemyShipV;
+    private Spaceship myShip;
+    private Spaceship enemyShip;
 
     private SensorManager sensorManager;
 
@@ -34,8 +31,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_screen);
 
-        myShipV = findViewById(R.id.myShip);
-        enemyShipV = findViewById(R.id.enemyShip);
+        View myShipV = findViewById(R.id.myShip);
+        View enemyShipV = findViewById(R.id.enemyShip);
+
+        myShip = new Spaceship((int)myShipV.getX(), (int)myShipV.getY(), myShipV);
+        enemyShip = new Spaceship((int)enemyShipV.getX(), (int)enemyShipV.getY(), enemyShipV);
 
         ActionBar bar = getSupportActionBar();
         try {
@@ -80,15 +80,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 case 1:
                 case 2:
                 case 3:
-                    if (myShipV.getX() < (maxX - 25)) {
-                        myShipV.setX(myShipV.getX() + 5);
+                    if (myShip.getX() < (maxX - 25)) {
+                        myShip.setX(myShip.getX() + 5);
                     }
                     break;
                 case 10:
                 case 11:
                 case 12:
-                    if (myShipV.getX() > 5) {
-                        myShipV.setX(myShipV.getX() - 5);
+                    if (myShip.getX() > 5) {
+                        myShip.setX(myShip.getX() - 5);
                     }
                     break;
             }

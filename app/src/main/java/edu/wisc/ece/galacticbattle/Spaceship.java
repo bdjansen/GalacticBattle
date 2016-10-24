@@ -1,5 +1,7 @@
 package edu.wisc.ece.galacticbattle;
 
+import android.view.View;
+
 import java.util.ArrayList;
 
 /**
@@ -12,13 +14,17 @@ public class Spaceship {
     private int heightRadius;
     private int lives = 3;
 
-    public Spaceship(int x, int y) {
+    public View ship;
+
+    public Spaceship(int x, int y, View v) {
         this.x = x;
         this.y = y;
+        this.ship = v;
     }
 
     public void setX(int x) {
         this.x = x;
+        ship.setX(x);
     }
 
     public boolean isHit(Bullet b)

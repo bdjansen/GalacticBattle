@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ImageView
-        android:layout_width="209dp"
-        android:layout_height="218dp"
+        android:scaleType="fitCenter"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/myShip"
+        android:src="@drawable/spaceship"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/enemyShip"
+        android:layout_alignStart="@+id/enemyShip" />
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:scaleType="fitCenter"
         android:id="@+id/enemyShip"
         android:src="@drawable/enemy"
-        android:layout_gravity="top|center_horizontal" />
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
-    <ImageView
-        android:layout_width="209dp"
-        android:layout_height="218dp"
-        android:scaleType="fitCenter"
-        android:id="@+id/myShip"
-        android:src="@drawable/spaceship"
-        android:layout_gravity="bottom" />
-
-</LinearLayout>
+</RelativeLayout>

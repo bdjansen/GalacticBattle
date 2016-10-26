@@ -29,7 +29,8 @@
         android:layout_marginLeft="20dp"
         android:layout_weight="2"
         android:text="There are no players nearby"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:background="@color/backgroundGray"/>
 
 
     <Button android:id="@+id/GoButton"

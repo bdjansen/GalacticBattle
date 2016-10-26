@@ -43,6 +43,11 @@ public class Spaceship {
         return x;
     }
 
+    public void hit()
+    {
+        lives = lives - 1;
+    }
+
     public int getY() {
         return y;
     }

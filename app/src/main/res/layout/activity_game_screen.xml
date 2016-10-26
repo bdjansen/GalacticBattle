@@ -5,8 +5,8 @@
 
     <ImageView
         android:scaleType="fitCenter"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="300px"
+        android:layout_height="300px"
         android:id="@+id/myShip"
         android:src="@drawable/spaceship"
         android:layout_alignParentBottom="true"
@@ -14,8 +14,8 @@
         android:layout_alignStart="@+id/enemyShip" />
 
     <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="300px"
+        android:layout_height="300px"
         android:scaleType="fitCenter"
         android:id="@+id/enemyShip"
         android:src="@drawable/enemy"

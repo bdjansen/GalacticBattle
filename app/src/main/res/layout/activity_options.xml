@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
@@ -58,10 +59,34 @@
         android:text="@string/ship_speed_descriptor"/>
 
     <SeekBar
+        android:id="@+id/gameSpeedSlider"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_below="@id/changeSpeedText"
         android:thumbTint="@color/blueThumb"
         />
 
+    <View
+        android:layout_below="@id/gameSpeedSlider"
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#000000" />
+
+    <Button android:id="@+id/saveOptionChanges"
+        android:layout_height="50dp"
+        android:layout_width="200dp"
+        android:layout_below="@id/gameSpeedSlider"
+        android:text="Save Changes"
+        android:onClick="saveUserData"
+        android:layout_marginTop="5dp"/>
+
+    <Button android:id="@+id/cancelOptionChanges"
+        android:layout_height="50dp"
+        android:layout_width="200dp"
+        android:text="Cancel"
+        android:onClick="cancelChanges"
+        android:layout_below="@id/gameSpeedSlider"
+        android:layout_toRightOf="@id/saveOptionChanges"
+        android:layout_marginTop="5dp"
+        />
 </RelativeLayout>

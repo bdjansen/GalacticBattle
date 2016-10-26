@@ -3,6 +3,9 @@ package edu.wisc.ece.galacticbattle;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.RadioButton;
+import android.widget.SeekBar;
 
 /**
  * Created by Blake on 10/17/2016.
@@ -17,6 +20,7 @@ public class OptionsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_options);
+        this.loadUserData();
 
     }
 
@@ -24,16 +28,34 @@ public class OptionsActivity extends AppCompatActivity {
         // Create the shared preferences variable so we can load in the data
         String mKey = getString(R.string.preference_name);
         SharedPreferences mPrefs = getSharedPreferences(mKey, MODE_PRIVATE);
+        int shipColor;
+        int shipSpeed;
 
         // Load the string of all the names and then split them by the correct character
         mKey = getString(R.string.preference_key_profile_colors);
+        shipColor = mPrefs.getInt(mKey, 1);
+
         //TODO: Put in loading colors
 
         mKey = getString(R.string.preference_key_profile_speed);
+        shipSpeed = mPrefs.getInt(mKey, 50);
         //TODO: Put in loading speed
+
+        switch (shipColor){
+            case 1: ((RadioButton)findViewById(R.id.shipColor1)).setChecked(true);
+                break;
+            case 2: ((RadioButton)findViewById(R.id.shipColor2)).setChecked(true);
+                break;
+            case 3: ((RadioButton)findViewById(R.id.shipColor3)).setChecked(true);
+                break;
+        }
+
+        SeekBar speedSlider = (SeekBar)findViewById(R.id.gameSpeedSlider);
+        speedSlider.setMax(100);
+        speedSlider.setProgress(shipSpeed);
     }
 
-    private void saveUserData() {
+    public void saveUserData(View v) {
         String mKey = getString(R.string.preference_name);
         SharedPreferences mPrefs = getSharedPreferences(mKey, MODE_PRIVATE);
 
@@ -42,12 +64,22 @@ public class OptionsActivity extends AppCompatActivity {
         mEditor.clear();
 
         mKey = getString(R.string.preference_key_profile_colors);
+        if(((RadioButton)findViewById(R.id.shipColor1)).isChecked()) mEditor.putInt(mKey, 1);
+        if(((RadioButton)findViewById(R.id.shipColor2)).isChecked()) mEditor.putInt(mKey, 2);
+        if(((RadioButton)findViewById(R.id.shipColor3)).isChecked()) mEditor.putInt(mKey, 3);
         //TODO: Put in saving colors
 
         mKey = getString(R.string.preference_key_profile_speed);
         //TODO: Put in saving speed
+        mEditor.putInt(mKey,((SeekBar)findViewById(R.id.gameSpeedSlider)).getProgress());
 
         // Officially commit the changes to the shared preferences
         mEditor.commit();
+
+        this.onBackPressed();
+    }
+
+    public void cancelChanges(View v){
+        this.onBackPressed();
     }
 }

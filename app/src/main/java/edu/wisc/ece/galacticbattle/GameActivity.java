@@ -47,7 +47,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sensorManager.registerListener(this,
-                sensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION),
+                sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_GAME);
 
     }
@@ -59,6 +59,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         {
             if (ship.isHit(current))
             {
+                ship.hit();
                 return true;
             }
         }
@@ -69,31 +70,63 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged (SensorEvent event) {
         Display mdisp = getWindowManager().getDefaultDisplay();
-        Point mdispSize = new Point();
-        mdisp.getSize(mdispSize);
-        int maxX = mdispSize.x;
+        Point size = new Point();
+        mdisp.getSize(size);
+        int maxX = size.x;
 
-        if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
-            int degrees = ((int)event.values[0]);
+        int speed = 0;
+        int imageWidth = 300;
 
-            switch((degrees/30))
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            int x = ((int)event.values[0]);
+            x = -(x);
+
+            switch(x)
             {
+                case -10:
+                case -9:
+                case -8:
+                case -7:
+                case -6:
+                case -5:
+                    speed = 10;
+                    break;
+                case -4:
+                case -3:
+                case -2:
+                case -1:
+                    speed = 5;
+                    break;
                 case 1:
                 case 2:
                 case 3:
-                    if (myShip.getX() < (maxX - 25)) {
-                        myShip.setX(myShip.getX() + 5);
-                    }
+                case 4:
+                    speed = 5;
                     break;
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
                 case 10:
-                case 11:
-                case 12:
-                    if (myShip.getX() > 5) {
-                        myShip.setX(myShip.getX() - 5);
-                    }
+                    speed = 10;
                     break;
             }
 
+            if (x > 0)
+            {
+                if (myShip.getX() < maxX - (imageWidth + speed))
+                {
+                    myShip.setX(myShip.getX() + speed);
+                }
+            }
+            else
+            {
+                if (myShip.getX() > speed)
+                {
+                    myShip.setX(myShip.getX() - speed);
+                }
+            }
         }
     }
     @Override
@@ -101,8 +134,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
-   // @Override
-   // public void onBackPressed() {
+    @Override
+   public void onBackPressed() {
 
-//    }
+   }
 }

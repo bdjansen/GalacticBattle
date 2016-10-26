@@ -19,6 +19,7 @@ import java.util.ArrayList;
  */
 
 public class GameActivity extends AppCompatActivity implements SensorEventListener {
+    public final static String EXTRA_OUTCOME = "com.example.galacticbattle.OUTCOME";
     private Spaceship myShip;
     private Spaceship enemyShip;
 

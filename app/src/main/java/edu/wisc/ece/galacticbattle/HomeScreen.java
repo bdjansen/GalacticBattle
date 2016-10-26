@@ -23,7 +23,7 @@ public class HomeScreen extends AppCompatActivity {
     public void searchPlayers(View v) {
         // Go back to the main activity
         Intent mIntent = new Intent(HomeScreen.this,
-                GameActivity.class);
+                FindPlayersActivity.class);
         startActivity(mIntent);
     }
 

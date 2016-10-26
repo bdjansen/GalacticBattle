@@ -23,6 +23,10 @@
             android:name=".GameActivity"
             android:label="GameActivity" >
         </activity>
+        <activity
+            android:name=".FindPlayersActivity"
+            android:label="FindPlayersActivity">
+        </activity>
     </application>
 
 </manifest>

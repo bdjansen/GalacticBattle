@@ -59,6 +59,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         {
             if (ship.isHit(current))
             {
+                ship.hit();
                 return true;
             }
         }

@@ -133,8 +133,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
-   // @Override
-   // public void onBackPressed() {
+    @Override
+   public void onBackPressed() {
 
-//    }
+   }
 }

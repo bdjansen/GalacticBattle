@@ -23,6 +23,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private Spaceship myShip;
     private Spaceship enemyShip;
 
+    private int maxX;
+
     private SensorManager sensorManager;
 
     private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
@@ -37,6 +39,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         myShip = new Spaceship((int)myShipV.getX(), (int)myShipV.getY(), myShipV);
         enemyShip = new Spaceship((int)enemyShipV.getX(), (int)enemyShipV.getY(), enemyShipV);
+
+        Display mdisp = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        mdisp.getSize(size);
+        maxX = size.x;
+
+        int magicNumber = 150;
+
+        myShip.setX(maxX/2 - magicNumber);
 
         ActionBar bar = getSupportActionBar();
         try {
@@ -69,11 +80,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged (SensorEvent event) {
-        Display mdisp = getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        mdisp.getSize(size);
-        int maxX = size.x;
-
         int speed = 0;
         int imageWidth = 300;
 
@@ -133,9 +139,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
+    //@Override
+   //public void onBackPressed() {
 
-    @Override
-   public void onBackPressed() {
-
-   }
+   //}
 }

@@ -102,6 +102,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     System.out.println("Action was UP");
                     canShoot = false;
                     timing = true;
+                    Bullet shot = new Bullet(myShip.getX(), myShip.getY() + 150, 50, 300);
+                    bullets.add(shot);
                 } else {
                     System.out.println("Tapped but didn't shoot");
                 }

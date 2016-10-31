@@ -34,6 +34,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager sensorManager;
 
     private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+    private ArrayList<Bullet> enemyBullets = new ArrayList<Bullet>();
 
     public boolean canShoot = true;
     public boolean timing = false;
@@ -106,6 +107,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     System.out.println("Action was UP");
                     canShoot = false;
                     timing = true;
+                    Bullet shot = new Bullet(myShip.getX(), myShip.getY() + 150, 50, 300);
+                    bullets.add(shot);
                 } else {
                     System.out.println("Tapped but didn't shoot");
                 }
@@ -119,11 +122,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     private boolean shipHit(Spaceship ship)
     {
-        for (Bullet current : bullets)
+        for (Bullet current : enemyBullets)
         {
             if (ship.isHit(current))
             {
                 ship.hit();
+                enemyBullets.remove(current);
                 return true;
             }
         }

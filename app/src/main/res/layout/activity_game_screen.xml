@@ -22,4 +22,11 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="Small Text"
+        android:id="@+id/tapScreen" />
+
 </RelativeLayout>

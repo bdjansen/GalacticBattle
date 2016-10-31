@@ -10,7 +10,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -49,6 +51,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_GAME);
+
+        TextView screen = (TextView) findViewById(R.id.tapScreen);
+        screen.setOnTouchListener(new View.OnTouchListener() {
+            public boolean onTouch(View v, MotionEvent event) {
+                // ... Respond to touch events
+                System.out.println("Screen Touched");
+                return true;
+            }
+        });
 
     }
 

@@ -31,9 +31,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 
-    public boolean canShoot = true;
-    public boolean timing = false;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +63,33 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_GAME);
 
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+
+        int action = MotionEventCompat.getActionMasked(event);
+
+        switch(action) {
+            case (MotionEvent.ACTION_DOWN) :
+                System.out.println("Action was DOWN");
+                return true;
+            case (MotionEvent.ACTION_MOVE) :
+                System.out.println("Action was MOVE");
+                return true;
+            case (MotionEvent.ACTION_UP) :
+                System.out.println("Action was UP");
+                return true;
+            case (MotionEvent.ACTION_CANCEL) :
+                System.out.println("Action was CANCEL");
+                return true;
+            case (MotionEvent.ACTION_OUTSIDE) :
+                System.out.println("Movement occurred outside bounds " +
+                        "of current screen element");
+                return true;
+            default :
+                return super.onTouchEvent(event);
+        }
         //This thread is set to update the timer as long as a boolean is set
         //It also uses the variables to do the logic corresponding to the timer value
         Thread shootTimer = new Thread() {
@@ -83,7 +107,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 }
             }
         };
-        
+
         shootTimer.start();
     }
 
@@ -167,7 +191,4 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
    //public void onBackPressed() {
 
    //}
-
-
-
 }

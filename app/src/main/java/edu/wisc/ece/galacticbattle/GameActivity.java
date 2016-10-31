@@ -74,10 +74,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void run() {
                 try {
-                    if(timing) {
-                        Thread.sleep(1);
-                        timing = false;
-                        canShoot = true;
+                    while(true) {
+                        if (timing) {
+                            Thread.sleep(1000);
+                            timing = false;
+                            canShoot = true;
+                        }
                     }
                 }
                 catch (InterruptedException e) {
@@ -95,20 +97,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         switch(action) {
             case (MotionEvent.ACTION_DOWN) :
-                System.out.println("Action was DOWN");
-                return true;
-            case (MotionEvent.ACTION_MOVE) :
-                System.out.println("Action was MOVE");
-                return true;
-            case (MotionEvent.ACTION_UP) :
-                System.out.println("Action was UP");
-                return true;
-            case (MotionEvent.ACTION_CANCEL) :
-                System.out.println("Action was CANCEL");
-                return true;
-            case (MotionEvent.ACTION_OUTSIDE) :
-                System.out.println("Movement occurred outside bounds " +
-                        "of current screen element");
+                if(canShoot) {
+                    System.out.println("Action was UP");
+                    canShoot = false;
+                    timing = true;
+                } else {
+                    System.out.println("Tapped but didn't shoot");
+                }
                 return true;
             default :
                 return super.onTouchEvent(event);

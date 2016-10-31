@@ -35,11 +35,8 @@ public class OptionsActivity extends AppCompatActivity {
         mKey = getString(R.string.preference_key_profile_colors);
         shipColor = mPrefs.getInt(mKey, 1);
 
-        //TODO: Put in loading colors
-
         mKey = getString(R.string.preference_key_profile_speed);
         shipSpeed = mPrefs.getInt(mKey, 50);
-        //TODO: Put in loading speed
 
         switch (shipColor){
             case 1: ((RadioButton)findViewById(R.id.shipColor1)).setChecked(true);
@@ -67,10 +64,8 @@ public class OptionsActivity extends AppCompatActivity {
         if(((RadioButton)findViewById(R.id.shipColor1)).isChecked()) mEditor.putInt(mKey, 1);
         if(((RadioButton)findViewById(R.id.shipColor2)).isChecked()) mEditor.putInt(mKey, 2);
         if(((RadioButton)findViewById(R.id.shipColor3)).isChecked()) mEditor.putInt(mKey, 3);
-        //TODO: Put in saving colors
 
         mKey = getString(R.string.preference_key_profile_speed);
-        //TODO: Put in saving speed
         mEditor.putInt(mKey,((SeekBar)findViewById(R.id.gameSpeedSlider)).getProgress());
 
         // Officially commit the changes to the shared preferences

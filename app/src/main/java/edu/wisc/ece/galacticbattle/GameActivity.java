@@ -31,6 +31,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 
+    public boolean canShoot = true;
+    public boolean timing = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,15 +66,25 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_GAME);
 
-        TextView screen = (TextView) findViewById(R.id.tapScreen);
-        screen.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                // ... Respond to touch events
-                System.out.println("Screen Touched");
-                return true;
-            }
-        });
+        //This thread is set to update the timer as long as a boolean is set
+        //It also uses the variables to do the logic corresponding to the timer value
+        Thread shootTimer = new Thread() {
 
+            @Override
+            public void run() {
+                try {
+                    if(timing) {
+                        Thread.sleep(1);
+                        timing = false;
+                        canShoot = true;
+                    }
+                }
+                catch (InterruptedException e) {
+                }
+            }
+        };
+        
+        shootTimer.start();
     }
 
 
@@ -154,4 +167,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
    //public void onBackPressed() {
 
    //}
+
+
+
 }

@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -30,6 +31,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private SensorManager sensorManager;
 
     private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
+
+    public boolean canShoot = true;
+    public boolean timing = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +67,25 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_GAME);
 
+        //This thread is set to update the timer as long as a boolean is set
+        //It also uses the variables to do the logic corresponding to the timer value
+        Thread shootTimer = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    if(timing) {
+                        Thread.sleep(1);
+                        timing = false;
+                        canShoot = true;
+                    }
+                }
+                catch (InterruptedException e) {
+                }
+            }
+        };
+
+        shootTimer.start();
     }
 
     @Override
@@ -90,25 +113,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             default :
                 return super.onTouchEvent(event);
         }
-        //This thread is set to update the timer as long as a boolean is set
-        //It also uses the variables to do the logic corresponding to the timer value
-        Thread shootTimer = new Thread() {
 
-            @Override
-            public void run() {
-                try {
-                    if(timing) {
-                        Thread.sleep(1);
-                        timing = false;
-                        canShoot = true;
-                    }
-                }
-                catch (InterruptedException e) {
-                }
-            }
-        };
-
-        shootTimer.start();
     }
 
 

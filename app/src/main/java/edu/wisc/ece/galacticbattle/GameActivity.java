@@ -5,6 +5,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -63,15 +64,33 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_GAME);
 
-        TextView screen = (TextView) findViewById(R.id.tapScreen);
-        screen.setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View v, MotionEvent event) {
-                // ... Respond to touch events
-                System.out.println("Screen Touched");
-                return true;
-            }
-        });
+    }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event){
+
+        int action = MotionEventCompat.getActionMasked(event);
+
+        switch(action) {
+            case (MotionEvent.ACTION_DOWN) :
+                System.out.println("Action was DOWN");
+                return true;
+            case (MotionEvent.ACTION_MOVE) :
+                System.out.println("Action was MOVE");
+                return true;
+            case (MotionEvent.ACTION_UP) :
+                System.out.println("Action was UP");
+                return true;
+            case (MotionEvent.ACTION_CANCEL) :
+                System.out.println("Action was CANCEL");
+                return true;
+            case (MotionEvent.ACTION_OUTSIDE) :
+                System.out.println("Movement occurred outside bounds " +
+                        "of current screen element");
+                return true;
+            default :
+                return super.onTouchEvent(event);
+        }
     }
 
 

@@ -31,4 +31,6 @@ public class Bullet {
     public int getWidthRadius() { return widthRadius; }
 
     public int getHeightRadius() { return heightRadius; }
+
+    public void fire() { y++; };
 }

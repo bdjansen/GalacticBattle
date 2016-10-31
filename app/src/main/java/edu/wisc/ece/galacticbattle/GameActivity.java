@@ -1,5 +1,6 @@
 package edu.wisc.ece.galacticbattle;
 
+import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -27,6 +29,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private Spaceship enemyShip;
 
     private int maxX;
+    private int shipSpeed;
 
     private SensorManager sensorManager;
 
@@ -40,8 +43,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_screen);
 
-        View myShipV = findViewById(R.id.myShip);
-        View enemyShipV = findViewById(R.id.enemyShip);
+        ImageView myShipV = (ImageView)findViewById(R.id.myShip);
+        ImageView enemyShipV = (ImageView)findViewById(R.id.enemyShip);
 
         myShip = new Spaceship((int)myShipV.getX(), (int)myShipV.getY(), myShipV);
         enemyShip = new Spaceship((int)enemyShipV.getX(), (int)enemyShipV.getY(), enemyShipV);
@@ -54,6 +57,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         int magicNumber = 150;
 
         myShip.setX(maxX/2 - magicNumber);
+
+        loadUserData();
 
         ActionBar bar = getSupportActionBar();
         try {
@@ -171,21 +176,62 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             {
                 if (myShip.getX() < maxX - (imageWidth + speed))
                 {
-                    myShip.setX(myShip.getX() + speed);
+                    myShip.setX(myShip.getX() + (speed + shipSpeed));
                 }
             }
             else
             {
                 if (myShip.getX() > speed)
                 {
-                    myShip.setX(myShip.getX() - speed);
+                    myShip.setX(myShip.getX() - (speed + shipSpeed));
                 }
             }
         }
     }
+
+    private void loadUserData() {
+        // Create the shared preferences variable so we can load in the data
+        String mKey = getString(R.string.preference_name);
+        SharedPreferences mPrefs = getSharedPreferences(mKey, MODE_PRIVATE);
+        int shipColor;
+
+        // Load the string of all the names and then split them by the correct character
+        mKey = getString(R.string.preference_key_profile_colors);
+        shipColor = mPrefs.getInt(mKey, 1);
+
+        mKey = getString(R.string.preference_key_profile_speed);
+        shipSpeed = mPrefs.getInt(mKey, 50);
+
+        switch (shipColor){
+            case 1: myShip.setSource(R.drawable.spaceship);
+                    enemyShip.setSource(R.drawable.spaceship);
+                    break;
+            case 2: myShip.setSource(R.drawable.spaceship_2);
+                    enemyShip.setSource(R.drawable.spaceship_2);
+                    break;
+            case 3: myShip.setSource(R.drawable.spaceship_3);
+                    enemyShip.setSource(R.drawable.spaceship_3);
+                    break;
+        }
+
+        switch (shipSpeed / 25)
+        {
+            case 0: shipSpeed = 0;
+                    break;
+            case 1: shipSpeed = 4;
+                    break;
+            case 2: shipSpeed = 8;
+                    break;
+            case 3: shipSpeed = 12;
+                    break;
+        }
+    }
+
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
+
+
 
     //@Override
    //public void onBackPressed() {

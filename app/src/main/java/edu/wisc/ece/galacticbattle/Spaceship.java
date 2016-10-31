@@ -1,6 +1,7 @@
 package edu.wisc.ece.galacticbattle;
 
 import android.view.View;
+import android.widget.ImageView;
 
 import java.util.ArrayList;
 
@@ -14,9 +15,9 @@ public class Spaceship {
     private int heightRadius;
     private int lives = 3;
 
-    public View ship;
+    public ImageView ship;
 
-    public Spaceship(int x, int y, View v) {
+    public Spaceship(int x, int y, ImageView v) {
         this.x = x;
         this.y = y;
         this.ship = v;
@@ -58,5 +59,10 @@ public class Spaceship {
 
     public boolean isAlive() {
         return lives > 0;
+    }
+
+    public void setSource(int id)
+    {
+        ship.setImageResource(id);
     }
 }

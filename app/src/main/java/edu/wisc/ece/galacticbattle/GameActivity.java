@@ -176,14 +176,14 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     break;
             }
 
-            if (x > 0)
+            if (x > 0 && (Math.abs(x) > 1))
             {
                 if (myShip.getX() < maxX - (imageWidth + speed))
                 {
                     myShip.setX(myShip.getX() + (speed + shipSpeed));
                 }
             }
-            else
+            else if (Math.abs(x) > 1)
             {
                 if (myShip.getX() > speed)
                 {

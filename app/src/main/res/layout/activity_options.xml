@@ -24,20 +24,20 @@
         <RadioButton
             android:id="@+id/shipColor1"
             android:layout_width="100dp"
-            android:layout_height="match_parent"
+            android:layout_height="70dp"
             android:drawableRight="@drawable/minispaceship"/>
 
         <RadioButton
             android:id="@+id/shipColor2"
             android:layout_width="100dp"
-            android:layout_height="match_parent"
-            android:drawableRight="@drawable/minispaceship"/>
+            android:layout_height="70dp"
+            android:drawableRight="@drawable/color_option_2"/>
 
         <RadioButton
             android:id="@+id/shipColor3"
             android:layout_width="100dp"
-            android:layout_height="match_parent"
-            android:drawableRight="@drawable/minispaceship"
+            android:layout_height="70dp"
+            android:drawableRight="@drawable/color_option_3"
             />
 
     </RadioGroup>

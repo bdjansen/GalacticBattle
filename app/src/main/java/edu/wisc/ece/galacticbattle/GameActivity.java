@@ -54,17 +54,20 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         myShip = new Spaceship((int) myShipV.getX(), (int) myShipV.getY(), myShipV);
         enemyShip = new Spaceship((int) enemyShipV.getX(), (int) enemyShipV.getY(), enemyShipV);
 
+        // Get max sreen size horizontally
         Display mdisp = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         mdisp.getSize(size);
         maxX = size.x;
 
+        // Setting our ship to be in the center of the screen to begin with
         int magicNumber = 150;
+        myShip.setX((maxX/2) - magicNumber);
 
-        myShip.setX(maxX / 2 - magicNumber);
-
+        // load user preferences
         loadUserData();
 
+        // hide action bar
         ActionBar bar = getSupportActionBar();
         try {
             bar.hide();
@@ -72,6 +75,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         }
 
+        // initiate accelerometer sensor
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
@@ -174,8 +178,10 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent event) {
         int speed = 0;
+        // Ship width in pixels
         int imageWidth = 300;
 
+        // Get x coordinate data and assign speed according to amount of phone tilt
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             int x = ((int) event.values[0]);
             x = -(x);
@@ -211,6 +217,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     break;
             }
 
+            // if tilted right, move ship right
             if (x > 0 && (Math.abs(x) > 1))
             {
                 if (myShip.getX() < maxX - (imageWidth + speed))
@@ -218,6 +225,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     myShip.setX(myShip.getX() + (speed + shipSpeed));
                 }
             }
+            // if tilted left, move ship left
             else if (Math.abs(x) > 1)
             {
                 if (myShip.getX() > speed)
@@ -234,41 +242,37 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         SharedPreferences mPrefs = getSharedPreferences(mKey, MODE_PRIVATE);
         int shipColor;
 
-        // Load the string of all the names and then split them by the correct character
+        // Load the string of colors and speed to grab the preferences
         mKey = getString(R.string.preference_key_profile_colors);
         shipColor = mPrefs.getInt(mKey, 1);
 
         mKey = getString(R.string.preference_key_profile_speed);
         shipSpeed = mPrefs.getInt(mKey, 50);
 
-        switch (shipColor) {
-            case 1:
-                myShip.setSource(R.drawable.spaceship);
-                enemyShip.setSource(R.drawable.spaceship);
-                break;
-            case 2:
-                myShip.setSource(R.drawable.spaceship_2);
-                enemyShip.setSource(R.drawable.spaceship_2);
-                break;
-            case 3:
-                myShip.setSource(R.drawable.spaceship_3);
-                enemyShip.setSource(R.drawable.spaceship_3);
-                break;
+        // Assign the ship colors based on the colors preference
+        switch (shipColor){
+            case 1: myShip.setSource(R.drawable.spaceship);
+                    enemyShip.setSource(R.drawable.enemy);
+                    break;
+            case 2: myShip.setSource(R.drawable.spaceship_2);
+                    enemyShip.setSource(R.drawable.spaceship_2_enemy);
+                    break;
+            case 3: myShip.setSource(R.drawable.spaceship_3);
+                    enemyShip.setSource(R.drawable.spaceship_3_enemy);
+                    break;
         }
 
-        switch (shipSpeed / 25) {
-            case 0:
-                shipSpeed = 0;
-                break;
-            case 1:
-                shipSpeed = 4;
-                break;
-            case 2:
-                shipSpeed = 8;
-                break;
-            case 3:
-                shipSpeed = 12;
-                break;
+        // Assign the shipSpeed based on the speed preference
+        switch (shipSpeed / 25)
+        {
+            case 0: shipSpeed = 0;
+                    break;
+            case 1: shipSpeed = 4;
+                    break;
+            case 2: shipSpeed = 8;
+                    break;
+            case 3: shipSpeed = 12;
+                    break;
         }
     }
 

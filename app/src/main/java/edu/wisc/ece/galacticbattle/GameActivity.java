@@ -21,6 +21,7 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by Blake on 10/17/2016.
@@ -102,22 +103,27 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
             @Override
             public void run() {
-                try {
-                    while(true) {
-                        Thread.sleep(1);
-                        for(Bullet current : bullets) {
-                            current.move();
-                            if(current.getY() > 1000) {
-                                RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
-                                layout.removeView(current.image());
-                                bullets.remove(current);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            while(true) {
+                                Thread.sleep(1);
+                                for(Bullet current : bullets) {
+                                    current.move();
+                                    if(current.getY() > 1000) {
+                                        RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
+                                        layout.removeView(current.image());
+                                        bullets.remove(current);
+                                    }
+                                    shipHit(myShip);
+                                }
                             }
-                            shipHit(myShip);
+                        }
+                        catch (InterruptedException e) {
                         }
                     }
-                }
-                catch (InterruptedException e) {
-                }
+                });
             }
         };
 
@@ -138,7 +144,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     ImageView v = new ImageView(this);
                     v.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                             LayoutParams.WRAP_CONTENT));
-                    Bullet shot = new Bullet(myShip.getX(), myShip.getY() + 150, 50, 300, v);
+                    Bullet shot = new Bullet(myShip.getX(), myShip.getY() + 150, 15, 50, v);
                     shot.setSource();
                     RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
                     layout.addView(v);

@@ -43,16 +43,17 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     public boolean canShoot = true;
     public boolean timing = false;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_screen);
 
-        ImageView myShipV = (ImageView)findViewById(R.id.myShip);
-        ImageView enemyShipV = (ImageView)findViewById(R.id.enemyShip);
+        ImageView myShipV = (ImageView) findViewById(R.id.myShip);
+        ImageView enemyShipV = (ImageView) findViewById(R.id.enemyShip);
 
-        myShip = new Spaceship((int)myShipV.getX(), (int)myShipV.getY(), myShipV);
-        enemyShip = new Spaceship((int)enemyShipV.getX(), (int)enemyShipV.getY(), enemyShipV);
+        myShip = new Spaceship((int) myShipV.getX(), (int) myShipV.getY(), myShipV);
+        enemyShip = new Spaceship((int) enemyShipV.getX(), (int) enemyShipV.getY(), enemyShipV);
 
         Display mdisp = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -61,7 +62,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         int magicNumber = 150;
 
-        myShip.setX(maxX/2 - magicNumber);
+        myShip.setX(maxX / 2 - magicNumber);
 
         loadUserData();
 
@@ -84,15 +85,14 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void run() {
                 try {
-                    while(true) {
+                    while (true) {
                         if (timing) {
                             Thread.sleep(1000);
                             timing = false;
                             canShoot = true;
                         }
                     }
-                }
-                catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                 }
             }
         };
@@ -103,27 +103,29 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
             @Override
             public void run() {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            while(true) {
-                                Thread.sleep(1);
-                                for(Bullet current : bullets) {
-                                    current.move();
-                                    if(current.getY() > 1000) {
-                                        RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
-                                        layout.removeView(current.image());
+                try {
+                    while (true) {
+                        Thread.sleep(1);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Bullet current[] = new Bullet[bullets.size()];
+                                bullets.toArray(current);
+                                for (int i = 0; i < current.length; i++) {
+                                    current[i].move();
+                                    if (current[i].getY() < 0) {
+                                        RelativeLayout layout =
+                                                (RelativeLayout) findViewById(R.id.layout);
+                                        layout.removeView(current[i].image());
                                         bullets.remove(current);
                                     }
                                     shipHit(myShip);
                                 }
                             }
-                        }
-                        catch (InterruptedException e) {
-                        }
+                        });
                     }
-                });
+                } catch (InterruptedException e) {
+                }
             }
         };
 
@@ -131,41 +133,36 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event){
+    public boolean onTouchEvent(MotionEvent event) {
 
         int action = MotionEventCompat.getActionMasked(event);
 
-        switch(action) {
-            case (MotionEvent.ACTION_DOWN) :
-                if(canShoot) {
+        switch (action) {
+            case (MotionEvent.ACTION_DOWN):
+                if (canShoot) {
                     System.out.println("Action was UP");
                     canShoot = false;
                     timing = true;
                     ImageView v = new ImageView(this);
-                    v.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
-                            LayoutParams.WRAP_CONTENT));
-                    Bullet shot = new Bullet(myShip.getX(), myShip.getY() + 150, 15, 50, v);
+                    Bullet shot = new Bullet(myShip.getX(), 1500, 15, 100, v);
                     shot.setSource();
                     RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
-                    layout.addView(v);
+                    layout.addView(shot.image());
                     bullets.add(shot);
                 } else {
                     System.out.println("Tapped but didn't shoot");
                 }
                 return true;
-            default :
+            default:
                 return super.onTouchEvent(event);
         }
 
     }
 
 
-    private boolean shipHit(Spaceship ship)
-    {
-        for (Bullet current : enemyBullets)
-        {
-            if (ship.isHit(current))
-            {
+    private boolean shipHit(Spaceship ship) {
+        for (Bullet current : enemyBullets) {
+            if (ship.isHit(current)) {
                 ship.hit();
                 enemyBullets.remove(current);
                 return true;
@@ -176,16 +173,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
     @Override
-    public void onSensorChanged (SensorEvent event) {
+    public void onSensorChanged(SensorEvent event) {
         int speed = 0;
         int imageWidth = 300;
 
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            int x = ((int)event.values[0]);
+            int x = ((int) event.values[0]);
             x = -(x);
 
-            switch(x)
-            {
+            switch (x) {
                 case -10:
                 case -9:
                 case -8:
@@ -216,17 +212,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     break;
             }
 
-            if (x > 0 && (Math.abs(x) > 1))
-            {
-                if (myShip.getX() < maxX - (imageWidth + speed))
-                {
+            if (x > 0 && Math.abs(x) > 1) {
+                if (myShip.getX() < maxX - (imageWidth + speed)) {
                     myShip.setX(myShip.getX() + (speed + shipSpeed));
                 }
-            }
-            else if (Math.abs(x) > 1)
-            {
-                if (myShip.getX() > speed)
-                {
+            } else if(x <= 0 && Math.abs(x) > 1) {
+                if (myShip.getX() > speed) {
                     myShip.setX(myShip.getX() - (speed + shipSpeed));
                 }
             }
@@ -246,35 +237,40 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         mKey = getString(R.string.preference_key_profile_speed);
         shipSpeed = mPrefs.getInt(mKey, 50);
 
-        switch (shipColor){
-            case 1: myShip.setSource(R.drawable.spaceship);
-                    enemyShip.setSource(R.drawable.spaceship);
-                    break;
-            case 2: myShip.setSource(R.drawable.spaceship_2);
-                    enemyShip.setSource(R.drawable.spaceship_2);
-                    break;
-            case 3: myShip.setSource(R.drawable.spaceship_3);
-                    enemyShip.setSource(R.drawable.spaceship_3);
-                    break;
+        switch (shipColor) {
+            case 1:
+                myShip.setSource(R.drawable.spaceship);
+                enemyShip.setSource(R.drawable.spaceship);
+                break;
+            case 2:
+                myShip.setSource(R.drawable.spaceship_2);
+                enemyShip.setSource(R.drawable.spaceship_2);
+                break;
+            case 3:
+                myShip.setSource(R.drawable.spaceship_3);
+                enemyShip.setSource(R.drawable.spaceship_3);
+                break;
         }
 
-        switch (shipSpeed / 25)
-        {
-            case 0: shipSpeed = 0;
-                    break;
-            case 1: shipSpeed = 4;
-                    break;
-            case 2: shipSpeed = 8;
-                    break;
-            case 3: shipSpeed = 12;
-                    break;
+        switch (shipSpeed / 25) {
+            case 0:
+                shipSpeed = 0;
+                break;
+            case 1:
+                shipSpeed = 4;
+                break;
+            case 2:
+                shipSpeed = 8;
+                break;
+            case 3:
+                shipSpeed = 12;
+                break;
         }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
-
 
 
     //@Override

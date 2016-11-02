@@ -242,13 +242,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         switch (shipColor){
             case 1: myShip.setSource(R.drawable.spaceship);
-                    enemyShip.setSource(R.drawable.spaceship);
+                    enemyShip.setSource(R.drawable.enemy);
                     break;
             case 2: myShip.setSource(R.drawable.spaceship_2);
-                    enemyShip.setSource(R.drawable.spaceship_2);
+                    enemyShip.setSource(R.drawable.spaceship_2_enemy);
                     break;
             case 3: myShip.setSource(R.drawable.spaceship_3);
-                    enemyShip.setSource(R.drawable.spaceship_3);
+                    enemyShip.setSource(R.drawable.spaceship_3_enemy);
                     break;
         }
 

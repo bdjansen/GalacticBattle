@@ -41,7 +41,7 @@ public class Bullet {
 
     public void move() { y++; bullet.setY(y); };
 
-    public void setSource() { bullet.setImageResource(R.drawable.laserBullet); }
+    public void setSource() { bullet.setImageResource(R.drawable.laserbullet); }
 
     public ImageView image() { return bullet; }
 }

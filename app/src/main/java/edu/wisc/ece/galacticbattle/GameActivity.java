@@ -6,6 +6,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.Image;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,8 @@ import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -94,6 +97,31 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         };
 
         shootTimer.start();
+
+        Thread bulletLogic = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    while(true) {
+                        Thread.sleep(1);
+                        for(Bullet current : bullets) {
+                            current.move();
+                            if(current.getY() > 1000) {
+                                RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
+                                layout.removeView(current.image());
+                                bullets.remove(current);
+                            }
+                            shipHit(myShip);
+                        }
+                    }
+                }
+                catch (InterruptedException e) {
+                }
+            }
+        };
+
+        bulletLogic.start();
     }
 
     @Override
@@ -107,7 +135,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     System.out.println("Action was UP");
                     canShoot = false;
                     timing = true;
-                    Bullet shot = new Bullet(myShip.getX(), myShip.getY() + 150, 50, 300);
+                    ImageView v = new ImageView(this);
+                    v.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
+                            LayoutParams.WRAP_CONTENT));
+                    Bullet shot = new Bullet(myShip.getX(), myShip.getY() + 150, 50, 300, v);
+                    shot.setSource();
+                    RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
+                    layout.addView(v);
                     bullets.add(shot);
                 } else {
                     System.out.println("Tapped but didn't shoot");

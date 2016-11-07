@@ -137,6 +137,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                     }
                                     shipHit(myShip);
                                     enemyHit();
+                                    // comment
                                 }
                             }
                         });

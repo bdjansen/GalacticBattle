@@ -8,6 +8,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.Image;
 import android.support.v4.view.MotionEventCompat;
+import android.support.v4.widget.Space;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -34,6 +35,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     private int maxX;
     private int shipSpeed;
+    int counter = 0;
 
     private SensorManager sensorManager;
 
@@ -49,20 +51,27 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_screen);
 
-        ImageView myShipV = (ImageView) findViewById(R.id.myShip);
-        ImageView enemyShipV = (ImageView) findViewById(R.id.enemyShip);
-
-        myShip = new Spaceship((int) myShipV.getX(), (int) myShipV.getY(), myShipV);
-        enemyShip = new Spaceship((int) enemyShipV.getX(), (int) enemyShipV.getY(), enemyShipV);
-
         Display mdisp = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         mdisp.getSize(size);
         maxX = size.x;
+        int maxY = size.y;
+
+        ImageView myShipV = (ImageView) findViewById(R.id.myShip);
+        ImageView enemyShipV = (ImageView) findViewById(R.id.enemyShip);
+
+        myShipV.layout(maxX / 2 - 150,maxY,maxX / 2 + 150,maxY - 300);
+        enemyShipV.layout(maxX / 2 - 150,0,maxX / 2 + 150,300);
+
+        System.out.println("SEARCH THIS: MY VIEW SHIP (x,y) = (" + myShipV.getX() + "," + myShipV.getY() + ")");
+        System.out.println("SEARCH THIS: ENEMY VIEW SHIP (x,y) = (" + enemyShipV.getX() + "," + enemyShipV.getY() + ")");
+
+        myShip = new Spaceship((int) myShipV.getX(), (int) myShipV.getY(), myShipV);
+        enemyShip = new Spaceship((int) enemyShipV.getX(), (int) enemyShipV.getY(), enemyShipV);
 
         int magicNumber = 150;
 
-        myShip.setX(maxX / 2 - magicNumber);
+        myShip.setX(maxX / 2);
 
         loadUserData();
 
@@ -105,6 +114,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             public void run() {
                 try {
                     while (true) {
+                        counter++;
                         Thread.sleep(1);
                         runOnUiThread(new Runnable() {
                             @Override
@@ -117,9 +127,16 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                         RelativeLayout layout =
                                                 (RelativeLayout) findViewById(R.id.layout);
                                         layout.removeView(current[i].image());
-                                        bullets.remove(current);
+                                        bullets.remove(current[i]);
+                                    }
+                                    if(counter % 100 == 0) {
+                                        System.out.println("1 " + current[i].getX());
+                                        System.out.println(current[i].getY());
+                                        System.out.println(enemyShip.getX());
+                                        System.out.println(enemyShip.getY());
                                     }
                                     shipHit(myShip);
+                                    enemyHit();
                                 }
                             }
                         });
@@ -144,13 +161,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     canShoot = false;
                     timing = true;
                     ImageView v = new ImageView(this);
-                    Bullet shot = new Bullet(myShip.getX(), 1500, 15, 100, v);
+                    Bullet shot = new Bullet(myShip.getX() + myShip.getWidthRadius() -
+                            15, myShip.getY() - myShip.getHeightRadius(), 15, 100, v);
                     shot.setSource();
                     RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
                     layout.addView(shot.image());
                     bullets.add(shot);
                 } else {
                     System.out.println("Tapped but didn't shoot");
+                    System.out.println(enemyShip.getY());
                 }
                 return true;
             default:
@@ -170,6 +189,25 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }
 
         return false;
+    }
+
+    private void enemyHit() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Bullet arrayBullets[] = new Bullet[bullets.size()];
+                bullets.toArray(arrayBullets);
+                for (Bullet current : arrayBullets) {
+                    if (enemyShip.isHit(current)) {
+                        RelativeLayout layout =
+                                (RelativeLayout) findViewById(R.id.layout);
+                        layout.removeView(current.image());
+                        System.out.println("HIT THE ENEMY");
+                        bullets.remove(current);
+                    }
+                }
+            }
+        });
     }
 
     @Override

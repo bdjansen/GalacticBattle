@@ -58,6 +58,7 @@ public class FindPlayersActivity extends ListActivity {
         }
 
 
+
     }
 
     public void Go(View v) {

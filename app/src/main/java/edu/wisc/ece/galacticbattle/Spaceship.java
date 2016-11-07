@@ -20,6 +20,8 @@ public class Spaceship {
     public Spaceship(int x, int y, ImageView v) {
         this.x = x;
         this.y = y;
+        this.widthRadius = 150;
+        this.heightRadius = 150;
         this.ship = v;
     }
 

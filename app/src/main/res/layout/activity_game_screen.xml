@@ -12,7 +12,8 @@
         android:src="@drawable/spaceship"
         android:layout_alignParentBottom="true"
         android:layout_alignLeft="@+id/enemyShip"
-        android:layout_alignStart="@+id/enemyShip" />
+        android:layout_alignStart="@+id/enemyShip"
+        />
 
     <ImageView
         android:layout_width="300px"

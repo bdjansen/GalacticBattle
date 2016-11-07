@@ -7,8 +7,8 @@ import android.widget.RelativeLayout;
  * Created by Blake on 10/17/2016.
  */
 public class Bullet {
-    private int x;
-    private int y;
+    private float x;
+    private float y;
     private int widthRadius;
     private int heightRadius;
 
@@ -24,17 +24,14 @@ public class Bullet {
         bullet.setY(y);
         bullet.setLayoutParams(new RelativeLayout.LayoutParams(widthRadius*2,
                 heightRadius*2));
+        bullet.layout(x - widthRadius, y - heightRadius, x + widthRadius, y + heightRadius);
     }
 
-    public int setY() {
-        return y;
-    }
-
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
@@ -42,7 +39,7 @@ public class Bullet {
 
     public int getHeightRadius() { return heightRadius; }
 
-    public void move() { y--; bullet.setY(y); };
+    public void move() { bullet.setY(bullet.getY() - 1); y = bullet.getY(); };
 
     public void setSource() { bullet.setImageResource(R.drawable.laser_bullet); }
 

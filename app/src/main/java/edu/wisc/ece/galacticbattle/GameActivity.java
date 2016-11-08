@@ -1,28 +1,21 @@
 package edu.wisc.ece.galacticbattle;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.media.Image;
 import android.support.v4.view.MotionEventCompat;
-import android.support.v4.widget.Space;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Display;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
-import android.widget.TextView;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by Blake on 10/17/2016.
@@ -66,12 +59,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         System.out.println("SEARCH THIS: MY VIEW SHIP (x,y) = (" + myShipV.getX() + "," + myShipV.getY() + ")");
         System.out.println("SEARCH THIS: ENEMY VIEW SHIP (x,y) = (" + enemyShipV.getX() + "," + enemyShipV.getY() + ")");
 
-        myShip = new Spaceship((int) myShipV.getX(), (int) myShipV.getY(), myShipV);
-        enemyShip = new Spaceship((int) enemyShipV.getX(), (int) enemyShipV.getY(), enemyShipV);
-
-        int magicNumber = 150;
-
-        myShip.setX(maxX / 2);
+        myShip = new Spaceship((int) myShipV.getX() - 150, (int) myShipV.getY(), myShipV);
+        enemyShip = new Spaceship((int) enemyShipV.getX() - 150,
+                (int) enemyShipV.getY(), enemyShipV);
 
         loadUserData();
 
@@ -135,7 +125,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                         System.out.println(enemyShip.getX());
                                         System.out.println(enemyShip.getY());
                                     }
-                                    shipHit(myShip);
+                                    shipHit();
                                     enemyHit();
                                 }
                             }
@@ -161,8 +151,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     canShoot = false;
                     timing = true;
                     ImageView v = new ImageView(this);
-                    Bullet shot = new Bullet(myShip.getX() + myShip.getWidthRadius() -
-                            15, myShip.getY() - myShip.getHeightRadius(), 15, 100, v);
+                    Bullet shot = new Bullet((int) myShip.getX() + myShip.getWidthRadius() -
+                            15, (int )myShip.getY() - myShip.getHeightRadius(), 15, 100, v);
                     shot.setSource();
                     RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
                     layout.addView(shot.image());
@@ -179,16 +169,27 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
-    private boolean shipHit(Spaceship ship) {
-        for (Bullet current : enemyBullets) {
-            if (ship.isHit(current)) {
-                ship.hit();
-                enemyBullets.remove(current);
-                return true;
+    private void shipHit() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Bullet arrayBullets[] = new Bullet[enemyBullets.size()];
+                enemyBullets.toArray(arrayBullets);
+                for (Bullet current : arrayBullets) {
+                    if (myShip.isHit(current)) {
+                        RelativeLayout layout =
+                                (RelativeLayout) findViewById(R.id.layout);
+                        layout.removeView(current.image());
+                        System.out.println("WE GOT HIT");
+                        enemyBullets.remove(current);
+                        myShip.hit();
+                        if(!myShip.isAlive()) {
+                            endGame("LOST");
+                        }
+                    }
+                }
             }
-        }
-
-        return false;
+        });
     }
 
     private void enemyHit() {
@@ -204,6 +205,10 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         layout.removeView(current.image());
                         System.out.println("HIT THE ENEMY");
                         bullets.remove(current);
+                        enemyShip.hit();
+                        if(!enemyShip.isAlive()) {
+                            endGame("WON");
+                        }
                     }
                 }
             }
@@ -252,11 +257,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
             if (x > 0 && Math.abs(x) > 1) {
                 if (myShip.getX() < maxX - (imageWidth + speed)) {
-                    myShip.setX(myShip.getX() + (speed + shipSpeed));
+                    myShip.setX((int) myShip.getX() + (speed + shipSpeed));
                 }
             } else if(x <= 0 && Math.abs(x) > 1) {
                 if (myShip.getX() > speed) {
-                    myShip.setX(myShip.getX() - (speed + shipSpeed));
+                    myShip.setX((int) myShip.getX() - (speed + shipSpeed));
                 }
             }
         }
@@ -304,6 +309,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 shipSpeed = 12;
                 break;
         }
+    }
+
+    public void endGame(String message) {
+        Intent intent = new Intent(this, EndScreenActivity.class);
+        intent.putExtra(EXTRA_OUTCOME, message);
+        startActivity(intent);
     }
 
     @Override

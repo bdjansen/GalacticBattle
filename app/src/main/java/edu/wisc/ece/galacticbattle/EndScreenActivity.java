@@ -13,7 +13,8 @@ public class EndScreenActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_options);
+        setContentView(R.layout.activity_end_screen);
+
         ActionBar bar = getSupportActionBar();
         try {
             bar.hide();
@@ -27,5 +28,25 @@ public class EndScreenActivity extends AppCompatActivity {
 
         TextView label = (TextView) findViewById(R.id.endOutcome);
         label.setText(endTitle);
+    }
+
+    @Override
+    public void onBackPressed() {
+        goToHome();
+    }
+
+    public void goToHome() {
+        Intent intent = new Intent(this, HomeScreen.class);
+        startActivity(intent);
+    }
+
+    public void goToFindPlayers() {
+        Intent intent = new Intent(this, FindPlayersActivity.class);
+        startActivity(intent);
+    }
+
+    public void goToGame() {
+        Intent intent = new Intent(this, GameActivity.class);
+        startActivity(intent);
     }
 }

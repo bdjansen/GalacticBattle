@@ -26,7 +26,7 @@ public class Spaceship {
     }
 
     public void setX(int x) {
-        this.x = x;
+        this.x = x - 15;
         ship.setX(x);
     }
 
@@ -38,12 +38,18 @@ public class Spaceship {
                 && b.getY() < y + heightRadius + b.getHeightRadius()){
             return true;
         }
+//        if(b.getX() > ship.getX() - b.getWidthRadius()
+//                && b.getX() < ship.getX() + widthRadius*2 + b.getWidthRadius()
+//                && b.getY() > ship.getY() - heightRadius - b.getHeightRadius()
+//                && b.getY() < ship.getY() + heightRadius + b.getHeightRadius()){
+//            return true;
+//        }
 
         return false;
     }
 
-    public int getX(){
-        return x;
+    public float getX(){
+        return ship.getX();
     }
 
     public void hit()
@@ -51,8 +57,8 @@ public class Spaceship {
         lives = lives - 1;
     }
 
-    public int getY() {
-        return y;
+    public float getY() {
+        return ship.getY();
     }
 
     public int getWidthRadius() { return widthRadius; }

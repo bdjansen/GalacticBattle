@@ -31,6 +31,10 @@
             android:name=".FindPlayersActivity"
             android:label="FindPlayersActivity">
         </activity>
+        <activity
+            android:name=".EndScreenActivity"
+            android:label="EndScreenActivity">
+        </activity>
     </application>
 
 </manifest>

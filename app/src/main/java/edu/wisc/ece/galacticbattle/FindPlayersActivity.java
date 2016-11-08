@@ -8,6 +8,7 @@ import android.app.ListActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class FindPlayersActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_players_activity);
 
-        // Define a new adapter based off of our loaded in names
+        // Define an adapter to hold the blutooth devices
         mAdapter = new ArrayAdapter<String>(this,
                 R.layout.activity_list_view_layout, FOLKS);
 
@@ -36,7 +37,7 @@ public class FindPlayersActivity extends ListActivity {
         setListAdapter(mAdapter);
 
         // Get the bluetooth adapter
-        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth
         }
@@ -48,28 +49,46 @@ public class FindPlayersActivity extends ListActivity {
         }
 
         // Display all previously paired devices on the ListView
-        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        final Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+
+        final Object [] arrayOfDevices = pairedDevices.toArray();
+
         // If there are paired devices
         if (pairedDevices.size() > 0) {
+            int i = 1;
+
             // Loop through paired devices
             for (BluetoothDevice device : pairedDevices) {
-                // Add the name and address to an array adapter to show in a ListView
-                mAdapter.add(device.getName());
+                // Add the name and index to an array adapter to show in a ListView
+                mAdapter.add(i + " " + device.getName());
+                i++;
             }
         }
 
-        // Testing
+        // set up both devices as servers
+        ServerThread server = new ServerThread(mBluetoothAdapter);
+        server.run();
+
+        // Define the listener interface
         AdapterView.OnItemClickListener mListener = new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
+                // get the index of the pushed device
                 TextView click = (TextView) view;
-                mAdapter.remove((String)click.getText());
-                mAdapter.notifyDataSetChanged();
+                String text = (String) click.getText();
+                String [] split = text.split(" ");
+                int index = Integer.parseInt(split[0]);
 
-                Toast toast = Toast.makeText(getApplicationContext(), click.getText() + " is removed from the list!", Toast.LENGTH_SHORT );
-                toast.show();
+                // get the BluetoothDevice object and set up this device as a client
+                BluetoothDevice pickedDevice = (BluetoothDevice) arrayOfDevices[index];
+                ClientThread client = new ClientThread(pickedDevice, mBluetoothAdapter);
+                client.run();
             }
         };
+
+        // Get the ListView and wire the listener
+        ListView listView = getListView();
+        listView.setOnItemClickListener(mListener);
     }
 
     public void Go(View v) {

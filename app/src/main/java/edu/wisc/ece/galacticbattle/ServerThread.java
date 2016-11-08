@@ -43,9 +43,9 @@ public class ServerThread extends Thread {
             }
             // If a connection was accepted
             if (socket != null) {
-                // Do work to manage the connection (in a separate thread)
-                //manageConnectedSocket(socket);
                 try {
+                    // Do work to manage the connection (in a separate thread)
+                    manageConnectedSocket(socket);
                     mmServerSocket.close();
                 }
                 catch (IOException e)
@@ -55,6 +55,11 @@ public class ServerThread extends Thread {
                 break;
             }
         }
+    }
+
+    private void manageConnectedSocket(BluetoothSocket socket)
+    {
+        System.out.print(socket.getRemoteDevice().getName());
     }
 
     /** Will cancel the listening socket, and cause the thread to finish */

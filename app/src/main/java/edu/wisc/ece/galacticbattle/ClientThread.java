@@ -51,7 +51,12 @@ public class ClientThread extends Thread {
         }
 
         // Do work to manage the connection (in a separate thread)
-        //manageConnectedSocket(mmSocket);
+        manageConnectedSocket(mmSocket);
+    }
+
+    private void manageConnectedSocket(BluetoothSocket socket)
+    {
+        System.out.print(socket.getRemoteDevice().getName());
     }
 
     /** Will cancel an in-progress connection, and close the socket */

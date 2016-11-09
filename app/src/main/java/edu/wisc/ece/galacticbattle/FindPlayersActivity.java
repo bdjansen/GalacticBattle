@@ -65,9 +65,14 @@ public class FindPlayersActivity extends ListActivity {
             }
         }
 
-        // set up both devices as servers
-        ServerThread server = new ServerThread(mBluetoothAdapter);
-        server.run();
+        Thread serverLogic = new Thread() {
+            public void run() {
+                // set up both devices as servers
+                ServerThread server = new ServerThread(mBluetoothAdapter);
+                server.run();
+            }
+        };
+        serverLogic.run();
 
         // Define the listener interface
         AdapterView.OnItemClickListener mListener = new AdapterView.OnItemClickListener() {

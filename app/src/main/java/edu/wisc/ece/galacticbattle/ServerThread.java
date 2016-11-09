@@ -14,7 +14,7 @@ import java.util.UUID;
  * Created by Owner-PC on 11/7/2016.
  */
 
-public class ServerThread extends Thread implements Serializable {
+public class ServerThread extends Thread {
     private final BluetoothServerSocket mmServerSocket;
     private BluetoothAdapter mAdapter;
     private BluetoothSocket socket;

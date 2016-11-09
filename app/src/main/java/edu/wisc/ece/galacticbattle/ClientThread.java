@@ -13,7 +13,7 @@ import java.util.UUID;
 /**
  * Created by Owner-PC on 11/7/2016.
  */
-public class ClientThread extends Thread implements Serializable {
+public class ClientThread extends Thread {
     private final BluetoothSocket mmSocket;
     private final BluetoothDevice mmDevice;
     private BluetoothAdapter mAdapter;

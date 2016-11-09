@@ -65,14 +65,9 @@ public class FindPlayersActivity extends ListActivity {
             }
         }
 
-        Thread serverLogic = new Thread() {
-            public void run() {
-                // set up both devices as servers
-                ServerThread server = new ServerThread(mBluetoothAdapter);
-                server.run();
-            }
-        };
-        serverLogic.run();
+        // set up both devices as servers
+        ServerThread server = new ServerThread(mBluetoothAdapter);
+        server.start();
 
         // Define the listener interface
         AdapterView.OnItemClickListener mListener = new AdapterView.OnItemClickListener() {
@@ -87,7 +82,7 @@ public class FindPlayersActivity extends ListActivity {
                 // get the BluetoothDevice object and set up this device as a client
                 BluetoothDevice pickedDevice = (BluetoothDevice) arrayOfDevices[index];
                 ClientThread client = new ClientThread(pickedDevice, mBluetoothAdapter);
-                client.run();
+                client.start();
             }
         };
 

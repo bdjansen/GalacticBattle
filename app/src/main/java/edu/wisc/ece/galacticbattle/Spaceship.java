@@ -32,9 +32,9 @@ public class Spaceship {
 
     public boolean isHit(Bullet b)
     {
-        if(b.getX() > x - widthRadius - b.getWidthRadius()
-                && b.getX() < x + widthRadius + b.getWidthRadius()
-                && b.getY() > y - heightRadius - b.getHeightRadius()
+        if(b.getX() > x - b.getWidthRadius()
+                && b.getX() < x + 2*widthRadius + b.getWidthRadius()
+                && b.getY() > y - b.getHeightRadius()
                 && b.getY() < y + heightRadius + b.getHeightRadius()){
             return true;
         }

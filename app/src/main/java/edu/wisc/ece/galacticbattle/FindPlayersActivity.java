@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.ListActivity;
+import android.os.Handler;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -98,6 +99,7 @@ public class FindPlayersActivity extends ListActivity {
 
     public void Go(View v) {
 
+        ConnectedThread connection;
 
         // Go back to the main activity
         Intent mIntent = new Intent(FindPlayersActivity.this,
@@ -105,11 +107,13 @@ public class FindPlayersActivity extends ListActivity {
 
         if (client.getSocket() != null)
         {
-            mIntent.putExtra("Thread", client);
+            //connection = new ConnectedThread(client.getSocket(), new Handler());
+            //mIntent.putExtra("Connected Thread", connection);
         }
         else if (server.getSocket() != null)
         {
-            mIntent.putExtra("Thread", server);
+            //connection = new ConnectedThread(server.getSocket(), new Handler());
+            //mIntent.putExtra("Connected Thread", connection);
         }
 
         startActivity(mIntent);

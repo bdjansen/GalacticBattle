@@ -3,8 +3,11 @@ package edu.wisc.ece.galacticbattle;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
+import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -14,11 +17,16 @@ import java.util.UUID;
 public class ServerThread extends Thread {
     private final BluetoothServerSocket mmServerSocket;
     private BluetoothAdapter mAdapter;
+    private BluetoothSocket socket;
+    private Context appContext;
 
-    public ServerThread(BluetoothAdapter adapter) {
+    public ServerThread(BluetoothAdapter adapter, Context appContext) {
         // Use a temporary object that is later assigned to mmServerSocket,
         // because mmServerSocket is final
         BluetoothServerSocket tmp = null;
+        socket = null;
+
+        this.appContext = appContext;
 
         mAdapter = adapter;
 
@@ -33,7 +41,7 @@ public class ServerThread extends Thread {
     }
 
     public void run() {
-        BluetoothSocket socket = null;
+        socket = null;
         // Keep listening until exception occurs or a socket is returned
         while (true) {
             try {
@@ -43,23 +51,24 @@ public class ServerThread extends Thread {
             }
             // If a connection was accepted
             if (socket != null) {
-                try {
-                    // Do work to manage the connection (in a separate thread)
-                    manageConnectedSocket(socket);
-                    mmServerSocket.close();
-                }
-                catch (IOException e)
-                {
-                    // error
-                }
-                break;
+                //Do work to manage the connection (in a separate thread)
+                manageConnectedSocket();
             }
         }
     }
 
-    private void manageConnectedSocket(BluetoothSocket socket)
+    private void manageConnectedSocket()
     {
-        System.out.print(socket.getRemoteDevice().getName());
+        CharSequence text = "You have connected to another device.";
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(appContext, text, duration);
+        toast.show();
+    }
+
+    public BluetoothSocket getSocket()
+    {
+        return socket;
     }
 
     /** Will cancel the listening socket, and cause the thread to finish */

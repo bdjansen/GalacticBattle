@@ -2,9 +2,12 @@ package edu.wisc.ece.galacticbattle;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.app.ListActivity;
+import android.os.Handler;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -21,6 +24,8 @@ import java.util.Set;
 public class FindPlayersActivity extends ListActivity {
     private ArrayAdapter<String> mAdapter;
     private ArrayList<String> FOLKS = new ArrayList<String>();
+    private ClientThread client;
+    private ServerThread server;
 
     private int REQUEST_ENABLE_BT;
 
@@ -65,8 +70,9 @@ public class FindPlayersActivity extends ListActivity {
             }
         }
 
-        // set up both devices as servers
-        ServerThread server = new ServerThread(mBluetoothAdapter);
+        final Context context = getApplicationContext();
+
+        server = new ServerThread(mBluetoothAdapter, context);
         server.start();
 
         // Define the listener interface
@@ -81,7 +87,7 @@ public class FindPlayersActivity extends ListActivity {
 
                 // get the BluetoothDevice object and set up this device as a client
                 BluetoothDevice pickedDevice = (BluetoothDevice) arrayOfDevices[index];
-                ClientThread client = new ClientThread(pickedDevice, mBluetoothAdapter);
+                client = new ClientThread(pickedDevice, mBluetoothAdapter, context);
                 client.start();
             }
         };
@@ -92,9 +98,24 @@ public class FindPlayersActivity extends ListActivity {
     }
 
     public void Go(View v) {
+
+        ConnectedThread connection;
+
         // Go back to the main activity
         Intent mIntent = new Intent(FindPlayersActivity.this,
                 GameActivity.class);
+
+        if (client.getSocket() != null)
+        {
+            //connection = new ConnectedThread(client.getSocket(), new Handler());
+            //mIntent.putExtra("Connected Thread", connection);
+        }
+        else if (server.getSocket() != null)
+        {
+            //connection = new ConnectedThread(server.getSocket(), new Handler());
+            //mIntent.putExtra("Connected Thread", connection);
+        }
+
         startActivity(mIntent);
     }
 }

@@ -3,8 +3,11 @@ package edu.wisc.ece.galacticbattle;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
+import android.widget.Toast;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -14,12 +17,15 @@ public class ClientThread extends Thread {
     private final BluetoothSocket mmSocket;
     private final BluetoothDevice mmDevice;
     private BluetoothAdapter mAdapter;
+    private Context appContext;
 
-    public ClientThread(BluetoothDevice device, BluetoothAdapter adapter) {
+    public ClientThread(BluetoothDevice device, BluetoothAdapter adapter, Context appContext) {
         // Use a temporary object that is later assigned to mmSocket,
         // because mmSocket is final
         BluetoothSocket tmp = null;
         mmDevice = device;
+
+        this.appContext = appContext;
 
         mAdapter = adapter;
 
@@ -51,12 +57,21 @@ public class ClientThread extends Thread {
         }
 
         // Do work to manage the connection (in a separate thread)
-        manageConnectedSocket(mmSocket);
+        manageConnectedSocket();
     }
 
-    private void manageConnectedSocket(BluetoothSocket socket)
+    public BluetoothSocket getSocket()
     {
-        System.out.print(socket.getRemoteDevice().getName());
+        return mmSocket;
+    }
+
+    private void manageConnectedSocket()
+    {
+        CharSequence text = "You have connected to another device.";
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(appContext, text, duration);
+        toast.show();
     }
 
     /** Will cancel an in-progress connection, and close the socket */

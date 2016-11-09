@@ -116,6 +116,16 @@ public class FindPlayersActivity extends ListActivity {
             //mIntent.putExtra("Connected Thread", connection);
         }
 
+        GalacticBattleApp myApp = (GalacticBattleApp)getApplicationContext();
+        if (client.getSocket() != null)
+        {
+            myApp.setSocket(client.getSocket());
+        }
+        else if (server.getSocket() != null)
+        {
+            myApp.setSocket(server.getSocket());
+        }
+
         startActivity(mIntent);
     }
 }

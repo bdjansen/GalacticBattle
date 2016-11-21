@@ -17,6 +17,7 @@ public class ConnectedThread extends Thread {
     private final OutputStream mmOutStream;
     private Handler handle;
     private final int MESSAGE_READ = 0;
+    private int getX;
 
     public ConnectedThread(BluetoothSocket socket, Handler handle) {
         mmSocket = socket;
@@ -36,7 +37,7 @@ public class ConnectedThread extends Thread {
     }
 
     public void run() {
-        byte[] buffer = new byte[1024];  // buffer store for the stream
+        byte[] buffer = new byte[1024];  // buffer store for the stream, possibly shorten this
         int bytes; // bytes returned from read()
 
         // Keep listening to the InputStream until an exception occurs
@@ -44,9 +45,12 @@ public class ConnectedThread extends Thread {
             try {
                 // Read from the InputStream
                 bytes = mmInStream.read(buffer);
+                int x = ((buffer[0] & 0xFF << 24) | (buffer[1] & 0xFF << 16) |
+                (buffer[2] & 0xFF << 8) | (buffer[3] & 0xFF));
+                System.out.println(x + "\n");
                 // Send the obtained bytes to the UI activity
-                handle.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
-                        .sendToTarget();
+                //handle.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
+                        //.sendToTarget();
             } catch (IOException e) {
                 break;
             }

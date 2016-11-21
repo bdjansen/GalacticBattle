@@ -65,9 +65,8 @@ public class FindPlayersActivity extends ListActivity {
             }
         }
 
-        final Context context = getApplicationContext();
 
-        server = new ServerThread(context);
+        server = new ServerThread();
         server.start();
 
         // Define the listener interface
@@ -82,7 +81,7 @@ public class FindPlayersActivity extends ListActivity {
                 // Get the BluetoothDevice object
                 BluetoothDevice pickedDevice = mBluetoothAdapter.getRemoteDevice(address);
 
-                client = new ClientThread(pickedDevice, context);
+                client = new ClientThread(pickedDevice);
                 client.start();
             }
         };
@@ -100,29 +99,12 @@ public class FindPlayersActivity extends ListActivity {
         Intent mIntent = new Intent(FindPlayersActivity.this,
                 GameActivity.class);
 
-        if (client != null && client.getSocket() != null)
-        {
-            //connection = new ConnectedThread(client.getSocket(), new Handler());
-            //mIntent.putExtra("Connected Thread", connection);
-            System.out.println("Client Goes");
-        }
-        else if (server != null && server.getSocket() != null)
-        {
-            //connection = new ConnectedThread(server.getSocket(), new Handler());
-            //mIntent.putExtra("Connected Thread", connection);\
-            System.out.println("Server Goes");
-        }
-        else {
-            System.out.println("No setup created\n");
-            return;
-        }
-
         GalacticBattleApp myApp = (GalacticBattleApp)getApplicationContext();
-        if (client.getSocket() != null)
+        if (client != null && client.getSocket() != null)
         {
             myApp.setSocket(client.getSocket());
         }
-        else if (server.getSocket() != null)
+        else if (server != null && server.getSocket() != null)
         {
             myApp.setSocket(server.getSocket());
         }

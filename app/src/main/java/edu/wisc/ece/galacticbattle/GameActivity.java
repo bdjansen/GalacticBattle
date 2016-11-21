@@ -47,6 +47,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         GalacticBattleApp myApp = (GalacticBattleApp) getApplicationContext();
         connectionThread = new ConnectedThread(myApp.getSocket(), null);
+        connectionThread.start();
 
         Display mdisp = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -128,10 +129,10 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                         enemyBullets.remove(current[i]);
                                     }
                                     if(counter % 100 == 0) {
-                                        System.out.println("1 " + current[i].getX());
-                                        System.out.println(current[i].getY());
-                                        System.out.println(enemyShip.getX());
-                                        System.out.println(enemyShip.getY());
+                                        //System.out.println("1 " + current[i].getX());
+                                        //System.out.println(current[i].getY());
+                                        //System.out.println(enemyShip.getX());
+                                        //System.out.println(enemyShip.getY());
                                     }
                                     shipHit();
                                     enemyHit();
@@ -139,6 +140,29 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                             }
                         });
                     }
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+
+        Thread writeLogic = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        int countWrite = 0;
+                        countWrite++;
+                        Thread.sleep(1);
+                        if(countWrite % 1000 == 0) {
+                            byte[] location = new byte[4];
+                            location[0] = (byte) ((((int) myShip.getX()) >> 24) & 0xFF);
+                            location[1] = (byte) ((((int) myShip.getX()) >> 16) & 0xFF);
+                            location[2] = (byte) ((((int) myShip.getX()) >> 8) & 0xFF);
+                            location[3] = (byte) (((int) myShip.getX()) & 0xFF);
+                            connectionThread.write(location);
+                        }
+                     }
                 } catch (InterruptedException e) {
                 }
             }

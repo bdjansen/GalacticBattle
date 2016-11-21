@@ -54,19 +54,14 @@ public class FindPlayersActivity extends ListActivity {
         }
 
         // Display all previously paired devices on the ListView
-        final Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-
-        final Object [] arrayOfDevices = pairedDevices.toArray();
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
 
         // If there are paired devices
         if (pairedDevices.size() > 0) {
-            int i = 1;
-
             // Loop through paired devices
             for (BluetoothDevice device : pairedDevices) {
                 // Add the name and index to an array adapter to show in a ListView
-                mAdapter.add(i + " " + device.getName());
-                i++;
+                mAdapter.add(device.getName() + "\n" + device.getAddress());
             }
         }
 
@@ -79,14 +74,14 @@ public class FindPlayersActivity extends ListActivity {
         AdapterView.OnItemClickListener mListener = new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                // get the index of the pushed device
-                TextView click = (TextView) view;
-                String text = (String) click.getText();
-                String [] split = text.split(" ");
-                int index = Integer.parseInt(split[0]);
 
-                // get the BluetoothDevice object and set up this device as a client
-                BluetoothDevice pickedDevice = (BluetoothDevice) arrayOfDevices[index];
+                // Get the device MAC address, which is the last 17 chars in the View
+                String info = ((TextView) view).getText().toString();
+                String address = info.substring(info.length() - 17);
+
+                // Get the BluetoothDevice object
+                BluetoothDevice pickedDevice = mBluetoothAdapter.getRemoteDevice(address);
+
                 client = new ClientThread(pickedDevice, context);
                 client.start();
             }

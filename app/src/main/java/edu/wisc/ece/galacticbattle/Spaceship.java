@@ -38,13 +38,6 @@ public class Spaceship {
                 && b.getY() < y + heightRadius + b.getHeightRadius()){
             return true;
         }
-//        if(b.getX() > ship.getX() - b.getWidthRadius()
-//                && b.getX() < ship.getX() + widthRadius*2 + b.getWidthRadius()
-//                && b.getY() > ship.getY() - heightRadius - b.getHeightRadius()
-//                && b.getY() < ship.getY() + heightRadius + b.getHeightRadius()){
-//            return true;
-//        }
-
         return false;
     }
 

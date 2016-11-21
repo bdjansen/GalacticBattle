@@ -59,8 +59,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         ImageView myShipV = (ImageView) findViewById(R.id.myShip);
         ImageView enemyShipV = (ImageView) findViewById(R.id.enemyShip);
 
-        myShipV.layout((int) (maxX / 2 - maxX*.1041667),maxY,
-                (int) (maxX / 2 + maxX*.1041667),(int) (maxY - maxY*.11719));
+        myShipV.layout((int) (maxX / 2 - maxX*.1041667),(int) (maxY - maxY*.11719),
+                (int) (maxX / 2 + maxX*.1041667),maxY);
         enemyShipV.layout((int) (maxX / 2 - maxX*.1041667),0,
                 (int) (maxX / 2 + maxX*.1041667),(int) (maxY*.11719));
 
@@ -117,15 +117,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Bullet current[] = new Bullet[bullets.size()];
-                                bullets.toArray(current);
+                                Bullet current[] = new Bullet[enemyBullets.size()];
+                                enemyBullets.toArray(current);
                                 for (int i = 0; i < current.length; i++) {
                                     current[i].move();
-                                    if (current[i].getY() < 0) {
+                                    if (current[i].getY() > 2560) {
                                         RelativeLayout layout =
                                                 (RelativeLayout) findViewById(R.id.layout);
                                         layout.removeView(current[i].image());
-                                        bullets.remove(current[i]);
+                                        enemyBullets.remove(current[i]);
                                     }
                                     if(counter % 100 == 0) {
                                         System.out.println("1 " + current[i].getX());
@@ -159,13 +159,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     canShoot = false;
                     timing = true;
                     ImageView v = new ImageView(this);
-                    Bullet shot = new Bullet((int) myShip.getX() + myShip.getWidthRadius() -
-                            myShip.getWidthRadius()/10, (int )myShip.getY() - myShip.getHeightRadius(),
-                            myShip.getWidthRadius()/10, myShip.getWidthRadius()*10/15, v);
+                    Bullet shot = new Bullet((int) enemyShip.getX() + enemyShip.getWidthRadius() -
+                            enemyShip.getWidthRadius()/10, (int )enemyShip.getY() - enemyShip.getHeightRadius(),
+                            enemyShip.getWidthRadius()/10, enemyShip.getWidthRadius()*10/15, v);
                     shot.setSource();
                     RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
                     layout.addView(shot.image());
-                    bullets.add(shot);
+                    enemyBullets.add(shot);
                 } else {
                     System.out.println("Tapped but didn't shoot");
                     System.out.println(enemyShip.getY());

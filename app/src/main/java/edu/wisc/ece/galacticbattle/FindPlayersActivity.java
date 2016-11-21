@@ -45,7 +45,6 @@ public class FindPlayersActivity extends ListActivity {
         final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth
-            System.out.println("\n\n\n\n\n\n\n\n");
         }
 
         // Make sure bluetooth is enabled on this device

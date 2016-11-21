@@ -45,6 +45,7 @@ public class FindPlayersActivity extends ListActivity {
         final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             // Device does not support Bluetooth
+            System.out.println("\n\n\n\n\n\n\n\n");
         }
 
         // Make sure bluetooth is enabled on this device
@@ -72,7 +73,7 @@ public class FindPlayersActivity extends ListActivity {
 
         final Context context = getApplicationContext();
 
-        server = new ServerThread(mBluetoothAdapter, context);
+        server = new ServerThread(context);
         server.start();
 
         // Define the listener interface
@@ -87,7 +88,7 @@ public class FindPlayersActivity extends ListActivity {
 
                 // get the BluetoothDevice object and set up this device as a client
                 BluetoothDevice pickedDevice = (BluetoothDevice) arrayOfDevices[index];
-                client = new ClientThread(pickedDevice, mBluetoothAdapter, context);
+                client = new ClientThread(pickedDevice, context);
                 client.start();
             }
         };
@@ -105,15 +106,21 @@ public class FindPlayersActivity extends ListActivity {
         Intent mIntent = new Intent(FindPlayersActivity.this,
                 GameActivity.class);
 
-        if (client.getSocket() != null)
+        if (client != null && client.getSocket() != null)
         {
             //connection = new ConnectedThread(client.getSocket(), new Handler());
             //mIntent.putExtra("Connected Thread", connection);
+            System.out.println("Client Goes");
         }
-        else if (server.getSocket() != null)
+        else if (server != null && server.getSocket() != null)
         {
             //connection = new ConnectedThread(server.getSocket(), new Handler());
-            //mIntent.putExtra("Connected Thread", connection);
+            //mIntent.putExtra("Connected Thread", connection);\
+            System.out.println("Server Goes");
+        }
+        else {
+            System.out.println("No setup created\n");
+            return;
         }
 
         GalacticBattleApp myApp = (GalacticBattleApp)getApplicationContext();

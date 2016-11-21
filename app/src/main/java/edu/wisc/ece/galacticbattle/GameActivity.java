@@ -25,6 +25,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     public final static String EXTRA_OUTCOME = "com.example.galacticbattle.OUTCOME";
     private Spaceship myShip;
     private Spaceship enemyShip;
+    private ConnectedThread connectionThread;
 
     private int maxX;
     private int shipSpeed;
@@ -44,23 +45,30 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_screen);
 
+        GalacticBattleApp myApp = (GalacticBattleApp) getApplicationContext();
+        connectionThread = new ConnectedThread(myApp.getSocket(), null);
+
         Display mdisp = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         mdisp.getSize(size);
         maxX = size.x;
         int maxY = size.y;
 
+        System.out.println("x " + size.x + "y " + size.y + "\n");
+
         ImageView myShipV = (ImageView) findViewById(R.id.myShip);
         ImageView enemyShipV = (ImageView) findViewById(R.id.enemyShip);
 
-        myShipV.layout(maxX / 2 - 150,maxY,maxX / 2 + 150,maxY - 300);
-        enemyShipV.layout(maxX / 2 - 150,0,maxX / 2 + 150,300);
+        myShipV.layout((int) (maxX / 2 - maxX*.1041667),maxY,
+                (int) (maxX / 2 + maxX*.1041667),(int) (maxY - maxY*.11719));
+        enemyShipV.layout((int) (maxX / 2 - maxX*.1041667),0,
+                (int) (maxX / 2 + maxX*.1041667),(int) (maxY*.11719));
 
         System.out.println("SEARCH THIS: MY VIEW SHIP (x,y) = (" + myShipV.getX() + "," + myShipV.getY() + ")");
         System.out.println("SEARCH THIS: ENEMY VIEW SHIP (x,y) = (" + enemyShipV.getX() + "," + enemyShipV.getY() + ")");
 
-        myShip = new Spaceship((int) myShipV.getX() - 150, (int) myShipV.getY(), myShipV);
-        enemyShip = new Spaceship((int) enemyShipV.getX() - 150,
+        myShip = new Spaceship((int) (myShipV.getX() - maxX*.1041667), (int) myShipV.getY(), myShipV);
+        enemyShip = new Spaceship((int) (enemyShipV.getX() - maxX*.1041667),
                 (int) enemyShipV.getY(), enemyShipV);
 
         loadUserData();
@@ -152,7 +160,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     timing = true;
                     ImageView v = new ImageView(this);
                     Bullet shot = new Bullet((int) myShip.getX() + myShip.getWidthRadius() -
-                            15, (int )myShip.getY() - myShip.getHeightRadius(), 15, 100, v);
+                            myShip.getWidthRadius()/10, (int )myShip.getY() - myShip.getHeightRadius(),
+                            myShip.getWidthRadius()/10, myShip.getWidthRadius()*10/15, v);
                     shot.setSource();
                     RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
                     layout.addView(shot.image());

@@ -16,11 +16,11 @@ import java.util.UUID;
 
 public class ServerThread extends Thread {
     private final BluetoothServerSocket mmServerSocket;
-    private BluetoothAdapter mAdapter;
+    private final BluetoothAdapter mAdapter;
     private BluetoothSocket socket;
     private Context appContext;
 
-    public ServerThread(BluetoothAdapter adapter, Context appContext) {
+    public ServerThread(Context appContext) {
         // Use a temporary object that is later assigned to mmServerSocket,
         // because mmServerSocket is final
         BluetoothServerSocket tmp = null;
@@ -28,14 +28,14 @@ public class ServerThread extends Thread {
 
         this.appContext = appContext;
 
-        mAdapter = adapter;
+        mAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // Generate UUID
         UUID uuid = UUID.fromString("b2fb123e-4742-430f-99a5-7d0d96ff62ae");
 
         try {
             // MY_UUID is the app's UUID string, also used by the client code
-            tmp = mAdapter.listenUsingRfcommWithServiceRecord("Galactic Battle", uuid);
+            tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord("Galactic Battle", uuid);
         } catch (IOException e) { }
         mmServerSocket = tmp;
     }
@@ -47,6 +47,7 @@ public class ServerThread extends Thread {
             try {
                 socket = mmServerSocket.accept();
             } catch (IOException e) {
+                System.out.println("Cannot Connect\n");
                 break;
             }
             // If a connection was accepted

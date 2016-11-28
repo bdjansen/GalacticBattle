@@ -65,9 +65,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         enemyShipV.layout((int) (maxX / 2 - maxX*.1041667),0,
                 (int) (maxX / 2 + maxX*.1041667),(int) (maxY*.11719));
 
-        System.out.println("SEARCH THIS: MY VIEW SHIP (x,y) = (" + myShipV.getX() + "," + myShipV.getY() + ")");
-        System.out.println("SEARCH THIS: ENEMY VIEW SHIP (x,y) = (" + enemyShipV.getX() + "," + enemyShipV.getY() + ")");
-
         myShip = new Spaceship((int) (myShipV.getX() - maxX*.1041667), (int) myShipV.getY(), myShipV);
         enemyShip = new Spaceship((int) (enemyShipV.getX() - maxX*.1041667),
                 (int) enemyShipV.getY(), enemyShipV);

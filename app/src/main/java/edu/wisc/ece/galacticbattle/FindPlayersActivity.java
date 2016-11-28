@@ -70,7 +70,7 @@ public class FindPlayersActivity extends ListActivity {
         server.start();
 
         // Define the listener interface
-        AdapterView.OnItemClickListener mListener = new AdapterView.OnItemClickListener() {
+       AdapterView.OnItemClickListener mListener = new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
 
@@ -93,7 +93,7 @@ public class FindPlayersActivity extends ListActivity {
 
     public void Go(View v) {
 
-        ConnectedThread connection;
+        //ConnectedThread connection;
 
         // Go back to the main activity
         Intent mIntent = new Intent(FindPlayersActivity.this,

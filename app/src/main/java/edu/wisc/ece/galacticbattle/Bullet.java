@@ -39,7 +39,7 @@ public class Bullet {
 
     public int getHeightRadius() { return heightRadius; }
 
-    public void move() { bullet.setY(bullet.getY() + 1); y = bullet.getY(); };
+    public void move() { bullet.setY(bullet.getY() - 1); y = bullet.getY(); };
 
     public void setSource() { bullet.setImageResource(R.drawable.laser_bullet); }
 

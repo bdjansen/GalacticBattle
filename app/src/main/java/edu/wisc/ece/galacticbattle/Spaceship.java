@@ -14,6 +14,7 @@ public class Spaceship {
     private int widthRadius;
     private int heightRadius;
     private int lives = 3;
+    private boolean canHit = true;
 
     public ImageView ship;
 
@@ -65,5 +66,13 @@ public class Spaceship {
     public void setSource(int id)
     {
         ship.setImageResource(id);
+    }
+
+    public boolean canHit() {
+        return canHit;
+    }
+
+    public void setHit(boolean bool) {
+        canHit = bool;
     }
 }

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 
 /**
  * Created by Owner-PC on 11/7/2016.
@@ -45,12 +46,10 @@ public class ConnectedThread extends Thread {
             try {
                 // Read from the InputStream
                 bytes = mmInStream.read(buffer);
-                int x = ((buffer[0] & 0xFF << 24) | (buffer[1] & 0xFF << 16) |
-                (buffer[2] & 0xFF << 8) | (buffer[3] & 0xFF));
-                System.out.println(x + "\n");
+                float shipX = ByteBuffer.wrap(buffer).getFloat();
                 // Send the obtained bytes to the UI activity
-                //handle.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
-                        //.sendToTarget();
+                handle.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
+                        .sendToTarget();
             } catch (IOException e) {
                 break;
             }

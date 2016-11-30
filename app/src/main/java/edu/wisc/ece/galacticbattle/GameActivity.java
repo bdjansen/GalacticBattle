@@ -415,6 +415,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
+    // lkjlkjl;klj
 
 
     //@Override

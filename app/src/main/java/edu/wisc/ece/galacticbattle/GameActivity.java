@@ -8,12 +8,14 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -26,6 +28,7 @@ import android.widget.RelativeLayout;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+
 
 /**
  * Created by Blake on 10/17/2016.
@@ -41,6 +44,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private int maxX;
     private int maxY;
     private int shipSpeed;
+    private GamePacket packet = new GamePacket();
+    private byte[] bytePacket = new byte[12];
+    GameActivity activity = this;
 
     private SensorManager sensorManager;
 
@@ -55,10 +61,55 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         @Override
         public void handleMessage(Message msg) {
             byte[] x = (byte[]) msg.obj;
-            float shipX = ByteBuffer.wrap(x).getFloat();
-            if(shipX > 0) {
-                enemyShip.setX((int) shipX);
-            }
+            ByteBuffer reader = ByteBuffer.wrap(x);
+            float shipX = reader.getFloat();
+//            int bullet = reader.getInt(8);
+//            if(bullet == 1) {
+//                    ImageView v = new ImageView(activity);
+//                    Bullet shot = new Bullet(enemyShip.getX(), enemyShip.getY() - enemyShip.getHeightRadius(), v);
+//                    shot.setSource();
+//                    v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
+//                    v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
+//                    v.setLayoutParams(new RelativeLayout.LayoutParams((int)(shot.getWidthRadius() * 2 * maxX),
+//                            (int)(shot.getHeightRadius()* 2 * maxY)));
+//                    RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
+//                    layout.addView(shot.image());
+//                    enemyBullets.add(shot);
+//              }
+              if(shipX > 0) {
+                  ImageView shipView = enemyShip.image();
+                  enemyShip.setX(shipX);
+                  shipView.setX((enemyShip.getX() - enemyShip.getWidthRadius()) * maxX);
+              }
+//            try {
+//                GamePacket received = (GamePacket) deserialize(x);
+//                float shipX = received.getX();
+//                float bulletX = received.getBulletX();
+//                if(bulletX != -1) {
+//                    ImageView v = new ImageView(activity);
+//                    Bullet shot = new Bullet(bulletX, enemyShip.getY() - enemyShip.getHeightRadius(), v);
+//                    shot.setSource();
+//                    v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
+//                    v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
+//                    v.setLayoutParams(new RelativeLayout.LayoutParams((int)(shot.getWidthRadius() * 2 * maxX),
+//                            (int)(shot.getHeightRadius()* 2 * maxY)));
+//                    RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
+//                    layout.addView(shot.image());
+//                    enemyBullets.add(shot);
+//                }
+//                if (shipX > 0) {
+//                    ImageView shipView = enemyShip.image();
+//                    enemyShip.setX(shipX);
+//                    shipView.setX((enemyShip.getX() - enemyShip.getWidthRadius()) * maxX);
+//                }
+//                if (received.getHit() == 1) {
+//
+//                }
+//            } catch(IOException e){
+//                System.out.println("Couldn't Deserialize\n");
+//            } catch(ClassNotFoundException e) {
+//                System.out.println("Couldn't Deserialize\n");
+//            }
         }
     };
 
@@ -205,9 +256,23 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                         layout.removeView(current[i].image());
                                         bullets.remove(current[i]);
                                     }
-                                    shipHit();
-                                    enemyHit();
+
                                 }
+                                Bullet currentEnemy[] = new Bullet[enemyBullets.size()];
+                                enemyBullets.toArray(currentEnemy);
+                                for (int i = 0; i < currentEnemy.length; i++) {
+                                    currentEnemy[i].moveEnemy();
+                                    ImageView movedImage = currentEnemy[i].image();
+                                    movedImage.setY((currentEnemy[i].getY() - currentEnemy[i].getHeightRadius())*maxY);
+                                    if (currentEnemy[i].getY() > maxY) {
+                                        RelativeLayout layout =
+                                                (RelativeLayout) findViewById(R.id.layout);
+                                        layout.removeView(currentEnemy[i].image());
+                                        enemyBullets.remove(currentEnemy[i]);
+                                    }
+                                }
+                                enemyHit();
+                                shipHit();
                             }
                         });
                     }
@@ -225,10 +290,24 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     while (true) {
                         countWrite++;
                         Thread.sleep(1);
-                        if(countWrite % 10 == 0) {
-                            float value = myShip.getX();
-                            byte[] location = ByteBuffer.allocate(4).putFloat(value).array();
+                        if(countWrite % 15 == 0) {
+                            float value = 1 - myShip.getX();
+                            byte[] location = ByteBuffer.allocate(8).putFloat(value).array();
+                            for(int i = 0; i < 8; i++) {
+                                bytePacket[i] = location[i];
+                            }
+//                            packet.setX(1 - value);
+//                            try {
+//                                //location = serialize(packet);
+//                                connectionThread.write(location);
+//                                //packet.setBulletX(-1);
+//                            } catch(IOException e) {
+//                                System.out.println("Couldn't Serialize\n");
+//                            }
                             connectionThread.write(location);
+                            for(int i = 0; i < 4; i++) {
+                                bytePacket[i + 8] = 0;
+                            }
                         }
                      }
                 } catch (InterruptedException e) {
@@ -253,6 +332,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     Bullet shot = new Bullet(myShip.getX(), myShip.getY() - myShip.getHeightRadius(), v);
                     shot.setSource();
                     v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
+                    packet.setBulletX(shot.getX());
+                    byte[] location = ByteBuffer.allocate(4).putInt(1).array();
+                    for(int i = 0; i < 4; i++) {
+                        bytePacket[i + 8] = location[i];
+                    }
                     v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
 
                     v.setLayoutParams(new RelativeLayout.LayoutParams((int)(shot.getWidthRadius() * 2 * maxX),
@@ -291,7 +375,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         RelativeLayout layout =
                                 (RelativeLayout) findViewById(R.id.layout);
                         layout.removeView(current.image());
-                        System.out.println("WE GOT HIT");
                         enemyBullets.remove(current);
                         if (!invulnerable) {
                             myShip.hit();
@@ -311,7 +394,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
                 // Ship blink code
                 final Animation blinking = new AlphaAnimation(1, 0);
                 blinking.setDuration(500);

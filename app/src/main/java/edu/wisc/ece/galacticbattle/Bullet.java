@@ -42,6 +42,14 @@ public class Bullet {
         */
     }
 
+    public void moveEnemy() {
+        this.y = this.y + (float)0.0005;
+        /*
+        bullet.setY(bullet.getY() - 1);
+        y = bullet.getY();
+        */
+    }
+
     public void setSource() { bullet.setImageResource(R.drawable.laser_bullet); }
 
     public ImageView image() { return bullet; }

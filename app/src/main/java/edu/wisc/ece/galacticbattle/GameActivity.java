@@ -9,6 +9,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +22,8 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import android.widget.ArrayAdapter;
 
@@ -51,11 +55,17 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     public boolean canShoot = true;
     public boolean timing = false;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            byte[] x = (byte[]) msg.obj;
+            float shipX = ByteBuffer.wrap(x).getFloat();
+            if(shipX > 0) {
+                enemyShip.setX((int) shipX);
+            }
+        }
+    };
 
 
     @Override
@@ -64,7 +74,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         setContentView(R.layout.activity_game_screen);
 
         GalacticBattleApp myApp = (GalacticBattleApp) getApplicationContext();
-        connectionThread = new ConnectedThread(myApp.getSocket(), null);
+        connectionThread = new ConnectedThread(myApp.getSocket(), mHandler);
+        connectionThread.start();
 
         Display mdisp = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -178,10 +189,28 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             }
         };
 
+        Thread writeLogic = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    int countWrite = 0;
+                    while (true) {
+                        countWrite++;
+                        Thread.sleep(1);
+                        if(countWrite % 10 == 0) {
+                            float value = myShip.getX();
+                            byte[] location = ByteBuffer.allocate(4).putFloat(value).array();
+                            connectionThread.write(location);
+                        }
+                     }
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+
         bulletLogic.start();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+        writeLogic.start();
     }
 
     @Override
@@ -385,42 +414,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-    }
-
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    public Action getIndexApiAction() {
-        Thing object = new Thing.Builder()
-                .setName("Game Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(client, getIndexApiAction());
-        client.disconnect();
     }
 
 

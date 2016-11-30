@@ -14,6 +14,7 @@ public class Spaceship {
     private float widthRadius;
     private float heightRadius;
     private int lives = 3;
+    private boolean canHit = true;
 
     public ImageView ship;
 
@@ -67,4 +68,12 @@ public class Spaceship {
     }
 
     public ImageView image() {return this.ship;}
+
+    public boolean canHit() {
+        return canHit;
+    }
+
+    public void setHit(boolean bool) {
+        canHit = bool;
+    }
 }

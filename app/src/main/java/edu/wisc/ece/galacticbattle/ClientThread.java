@@ -17,15 +17,12 @@ public class ClientThread extends Thread {
     private final BluetoothSocket mmSocket;
     private final BluetoothDevice mmDevice;
     private final BluetoothAdapter mAdapter;
-    private Context appContext;
 
-    public ClientThread(BluetoothDevice device, Context appContext) {
+    public ClientThread(BluetoothDevice device) {
         // Use a temporary object that is later assigned to mmSocket,
         // because mmSocket is final
         BluetoothSocket tmp = null;
         mmDevice = device;
-
-        this.appContext = appContext;
 
         mAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -70,11 +67,7 @@ public class ClientThread extends Thread {
 
     private void manageConnectedSocket()
     {
-        CharSequence text = "You have connected to another device.";
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(appContext, text, duration);
-        toast.show();
+        System.out.println("YESSSS");
     }
 
     /** Will cancel an in-progress connection, and close the socket */

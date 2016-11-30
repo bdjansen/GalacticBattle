@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 
 /**
  * Created by Owner-PC on 11/7/2016.
@@ -17,6 +18,7 @@ public class ConnectedThread extends Thread {
     private final OutputStream mmOutStream;
     private Handler handle;
     private final int MESSAGE_READ = 0;
+    private int getX;
 
     public ConnectedThread(BluetoothSocket socket, Handler handle) {
         mmSocket = socket;
@@ -36,7 +38,7 @@ public class ConnectedThread extends Thread {
     }
 
     public void run() {
-        byte[] buffer = new byte[1024];  // buffer store for the stream
+        byte[] buffer = new byte[1024];  // buffer store for the stream, possibly shorten this
         int bytes; // bytes returned from read()
 
         // Keep listening to the InputStream until an exception occurs
@@ -44,6 +46,7 @@ public class ConnectedThread extends Thread {
             try {
                 // Read from the InputStream
                 bytes = mmInStream.read(buffer);
+                float shipX = ByteBuffer.wrap(buffer).getFloat();
                 // Send the obtained bytes to the UI activity
                 handle.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                         .sendToTarget();

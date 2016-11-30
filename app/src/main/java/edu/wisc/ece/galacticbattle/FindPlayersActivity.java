@@ -54,40 +54,34 @@ public class FindPlayersActivity extends ListActivity {
         }
 
         // Display all previously paired devices on the ListView
-        final Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-
-        final Object [] arrayOfDevices = pairedDevices.toArray();
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
 
         // If there are paired devices
         if (pairedDevices.size() > 0) {
-            int i = 1;
-
             // Loop through paired devices
             for (BluetoothDevice device : pairedDevices) {
                 // Add the name and index to an array adapter to show in a ListView
-                mAdapter.add(i + " " + device.getName());
-                i++;
+                mAdapter.add(device.getName() + "\n" + device.getAddress());
             }
         }
 
-        final Context context = getApplicationContext();
 
-        server = new ServerThread(context);
+        server = new ServerThread();
         server.start();
 
         // Define the listener interface
-        AdapterView.OnItemClickListener mListener = new AdapterView.OnItemClickListener() {
+       AdapterView.OnItemClickListener mListener = new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                // get the index of the pushed device
-                TextView click = (TextView) view;
-                String text = (String) click.getText();
-                String [] split = text.split(" ");
-                int index = Integer.parseInt(split[0]);
 
-                // get the BluetoothDevice object and set up this device as a client
-                BluetoothDevice pickedDevice = (BluetoothDevice) arrayOfDevices[index];
-                client = new ClientThread(pickedDevice, context);
+                // Get the device MAC address, which is the last 17 chars in the View
+                String info = ((TextView) view).getText().toString();
+                String address = info.substring(info.length() - 17);
+
+                // Get the BluetoothDevice object
+                BluetoothDevice pickedDevice = mBluetoothAdapter.getRemoteDevice(address);
+
+                client = new ClientThread(pickedDevice);
                 client.start();
             }
         };
@@ -99,35 +93,18 @@ public class FindPlayersActivity extends ListActivity {
 
     public void Go(View v) {
 
-        ConnectedThread connection;
+        //ConnectedThread connection;
 
         // Go back to the main activity
         Intent mIntent = new Intent(FindPlayersActivity.this,
                 GameActivity.class);
 
-        if (client != null && client.getSocket() != null)
-        {
-            //connection = new ConnectedThread(client.getSocket(), new Handler());
-            //mIntent.putExtra("Connected Thread", connection);
-            System.out.println("Client Goes");
-        }
-        else if (server != null && server.getSocket() != null)
-        {
-            //connection = new ConnectedThread(server.getSocket(), new Handler());
-            //mIntent.putExtra("Connected Thread", connection);\
-            System.out.println("Server Goes");
-        }
-        else {
-            System.out.println("No setup created\n");
-            return;
-        }
-
         GalacticBattleApp myApp = (GalacticBattleApp)getApplicationContext();
-        if (client.getSocket() != null)
+        if (client != null && client.getSocket() != null)
         {
             myApp.setSocket(client.getSocket());
         }
-        else if (server.getSocket() != null)
+        else if (server != null && server.getSocket() != null)
         {
             myApp.setSocket(server.getSocket());
         }

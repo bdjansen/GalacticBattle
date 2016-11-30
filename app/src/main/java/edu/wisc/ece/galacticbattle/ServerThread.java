@@ -18,15 +18,12 @@ public class ServerThread extends Thread {
     private final BluetoothServerSocket mmServerSocket;
     private final BluetoothAdapter mAdapter;
     private BluetoothSocket socket;
-    private Context appContext;
 
-    public ServerThread(Context appContext) {
+    public ServerThread() {
         // Use a temporary object that is later assigned to mmServerSocket,
         // because mmServerSocket is final
         BluetoothServerSocket tmp = null;
         socket = null;
-
-        this.appContext = appContext;
 
         mAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -60,11 +57,7 @@ public class ServerThread extends Thread {
 
     private void manageConnectedSocket()
     {
-        CharSequence text = "You have connected to another device.";
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(appContext, text, duration);
-        toast.show();
+        System.out.println("Server YESSS");
     }
 
     public BluetoothSocket getSocket()

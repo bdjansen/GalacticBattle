@@ -8,29 +8,24 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import android.widget.ArrayAdapter;
-
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
 
 /**
  * Created by Blake on 10/17/2016.
@@ -46,7 +41,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private int maxX;
     private int maxY;
     private int shipSpeed;
-    int counter = 0;
 
     private SensorManager sensorManager;
 
@@ -54,7 +48,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private ArrayList<Bullet> enemyBullets = new ArrayList<Bullet>();
 
     public boolean canShoot = true;
-    public boolean timing = false;
+    public boolean invulnerable = false;
+    public boolean enemyInvulnerable = false;
 
     private final Handler mHandler = new Handler() {
         @Override
@@ -154,7 +149,41 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             }
         };
 
+        final Thread invulnerableThread = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        if (invulnerable) {
+                            Thread.sleep(2500);
+                            invulnerable = false;
+                        }
+                    }
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+
+        Thread enemyInvulnerableThread = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        if (enemyInvulnerable) {
+                            Thread.sleep(2500);
+                            enemyInvulnerable = false;
+                        }
+                    }
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+
         shootTimer.start();
+        invulnerableThread.start();
+        enemyInvulnerableThread.start();
 
         Thread bulletLogic = new Thread() {
 
@@ -249,6 +278,14 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+
+                // Ship blink code
+                final Animation blinking = new AlphaAnimation(1, 0);
+                blinking.setDuration(500);
+                blinking.setInterpolator(new LinearInterpolator());
+                blinking.setRepeatCount(5);
+                blinking.setRepeatMode(Animation.REVERSE);
+
                 Bullet arrayBullets[] = new Bullet[enemyBullets.size()];
                 enemyBullets.toArray(arrayBullets);
                 for (Bullet current : arrayBullets) {
@@ -258,8 +295,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         layout.removeView(current.image());
                         System.out.println("WE GOT HIT");
                         enemyBullets.remove(current);
-                        myShip.hit();
-                        if (!myShip.isAlive()) {
+                        if (!invulnerable) {
+                            myShip.hit();
+                            myShip.ship.startAnimation(blinking);
+                            invulnerable = true;
+                        }
+                        if(!myShip.isAlive()) {
                             endGame("LOST");
                         }
                     }
@@ -272,6 +313,14 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+
+                // Ship blink code
+                final Animation blinking = new AlphaAnimation(1, 0);
+                blinking.setDuration(500);
+                blinking.setInterpolator(new LinearInterpolator());
+                blinking.setRepeatCount(5);
+                blinking.setRepeatMode(Animation.REVERSE);
+
                 Bullet arrayBullets[] = new Bullet[bullets.size()];
                 bullets.toArray(arrayBullets);
                 for (Bullet current : arrayBullets) {
@@ -281,8 +330,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         layout.removeView(current.image());
                         System.out.println("HIT THE ENEMY");
                         bullets.remove(current);
-                        enemyShip.hit();
-                        if (!enemyShip.isAlive()) {
+                        if (!enemyInvulnerable) {
+                            enemyShip.hit();
+                            enemyShip.ship.startAnimation(blinking);
+                            enemyInvulnerable = true;
+                        }
+                        if(!enemyShip.isAlive()) {
                             endGame("WON");
                         }
                     }
@@ -310,7 +363,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent event) {
         float speed = 0;
-        double imageWidth = 0.05;//width ratio of ship
 
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             int x = ((int) event.values[0]);
@@ -415,7 +467,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
-    // lkjlkjl;klj
 
 
     //@Override

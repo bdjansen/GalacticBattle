@@ -27,12 +27,11 @@ public class FindPlayersActivity extends ListActivity {
     private ClientThread client;
     private ServerThread server;
 
-    private int REQUEST_ENABLE_BT;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_players_activity);
+
 
         // Define an adapter to hold the blutooth devices
         mAdapter = new ArrayAdapter<String>(this,
@@ -40,6 +39,7 @@ public class FindPlayersActivity extends ListActivity {
 
         // Assign the adapter to ListView
         setListAdapter(mAdapter);
+
 
         // Get the bluetooth adapter
         final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -50,7 +50,7 @@ public class FindPlayersActivity extends ListActivity {
         // Make sure bluetooth is enabled on this device
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+            startActivity(enableBtIntent);
         }
 
         // Display all previously paired devices on the ListView
@@ -69,10 +69,12 @@ public class FindPlayersActivity extends ListActivity {
         server = new ServerThread();
         server.start();
 
+
         // Define the listener interface
        AdapterView.OnItemClickListener mListener = new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
+
 
                 // Get the device MAC address, which is the last 17 chars in the View
                 String info = ((TextView) view).getText().toString();
@@ -83,6 +85,7 @@ public class FindPlayersActivity extends ListActivity {
 
                 client = new ClientThread(pickedDevice);
                 client.start();
+
             }
         };
 
@@ -98,6 +101,7 @@ public class FindPlayersActivity extends ListActivity {
         // Go back to the main activity
         Intent mIntent = new Intent(FindPlayersActivity.this,
                 GameActivity.class);
+
 
         GalacticBattleApp myApp = (GalacticBattleApp)getApplicationContext();
         if (client != null && client.getSocket() != null)

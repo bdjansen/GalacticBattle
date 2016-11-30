@@ -8,19 +8,17 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Handler;
-import android.os.Message;
+import android.os.Bundle;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -28,15 +26,13 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 /**
- * Created by Blake on 10/17/2016.
+ * Created by Owner-PC on 11/30/2016.
  */
-
-public class GameActivity extends AppCompatActivity implements SensorEventListener {
+public class CampaignActivity extends AppCompatActivity implements SensorEventListener {
     public final static String EXTRA_OUTCOME = "com.example.galacticbattle.OUTCOME";
+
     private Spaceship myShip;
-    private Spaceship enemyShip;
     private ArrayList<SpaceInvader> spaceInvaders;
-    private ConnectedThread connectionThread;
 
     private int maxX;
     private int maxY;
@@ -49,28 +45,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     public boolean canShoot = true;
     public boolean invulnerable = false;
-    public boolean enemyInvulnerable = false;
-
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            byte[] x = (byte[]) msg.obj;
-            float shipX = ByteBuffer.wrap(x).getFloat();
-            if(shipX > 0) {
-                enemyShip.setX((int) shipX);
-            }
-        }
-    };
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game_screen);
-
-        GalacticBattleApp myApp = (GalacticBattleApp) getApplicationContext();
-        connectionThread = new ConnectedThread(myApp.getSocket(), mHandler);
-        connectionThread.start();
+        setContentView(R.layout.activity_campaign);
 
         Display mdisp = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -79,21 +58,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         maxY = size.y;
 
         ImageView myShipV = (ImageView) findViewById(R.id.myShip);
-        ImageView enemyShipV = (ImageView) findViewById(R.id.enemyShip);
 
         myShipV.setLayoutParams(new RelativeLayout.LayoutParams((int)(maxX * 0.1) , (int)(maxX * .1)));
-        enemyShipV.setLayoutParams(new RelativeLayout.LayoutParams((int)(maxX * 0.1) , (int)(maxX * .1)));
 
         myShip = new Spaceship((float)0.5, (float)0.95, myShipV);//middle of ship location
-        enemyShip = new Spaceship((float)0.5, (float)0.05, enemyShipV);
 
         myShipV.setX(maxX * (myShip.getX() - myShip.getWidthRadius()));
         myShipV.setY(maxY * (myShip.getY() - myShip.getWidthRadius()));
-        enemyShipV.setX(maxX * (enemyShip.getX() - enemyShip.getWidthRadius()));
-        enemyShipV.setY(maxY * (enemyShip.getY() - enemyShip.getWidthRadius()));
 
         System.out.println("SEARCH THIS: MY VIEW SHIP (x,y) = (" + myShipV.getX() + "," + myShipV.getY() + ")");
-        System.out.println("SEARCH THIS: ENEMY VIEW SHIP (x,y) = (" + enemyShipV.getX() + "," + enemyShipV.getY() + ")");
 
         spaceInvaders = new ArrayList<SpaceInvader>();
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -163,25 +136,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             }
         };
 
-        Thread enemyInvulnerableThread = new Thread() {
-
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        if (enemyInvulnerable) {
-                            Thread.sleep(2500);
-                            enemyInvulnerable = false;
-                        }
-                    }
-                } catch (InterruptedException e) {
-                }
-            }
-        };
-
         shootTimer.start();
         invulnerableThread.start();
-        enemyInvulnerableThread.start();
 
         Thread bulletLogic = new Thread() {
 
@@ -216,28 +172,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             }
         };
 
-        Thread writeLogic = new Thread() {
-
-            @Override
-            public void run() {
-                try {
-                    int countWrite = 0;
-                    while (true) {
-                        countWrite++;
-                        Thread.sleep(1);
-                        if(countWrite % 10 == 0) {
-                            float value = myShip.getX();
-                            byte[] location = ByteBuffer.allocate(4).putFloat(value).array();
-                            connectionThread.write(location);
-                        }
-                     }
-                } catch (InterruptedException e) {
-                }
-            }
-        };
-
         bulletLogic.start();
-        writeLogic.start();
     }
 
     @Override
@@ -311,32 +246,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-
-                // Ship blink code
-                final Animation blinking = new AlphaAnimation(1, 0);
-                blinking.setDuration(500);
-                blinking.setInterpolator(new LinearInterpolator());
-                blinking.setRepeatCount(5);
-                blinking.setRepeatMode(Animation.REVERSE);
-
                 Bullet arrayBullets[] = new Bullet[bullets.size()];
                 bullets.toArray(arrayBullets);
                 for (Bullet current : arrayBullets) {
-                    if (enemyShip.isHit(current)) {
-                        RelativeLayout layout =
-                                (RelativeLayout) findViewById(R.id.layout);
-                        layout.removeView(current.image());
-                        System.out.println("HIT THE ENEMY");
-                        bullets.remove(current);
-                        if (!enemyInvulnerable) {
-                            enemyShip.hit();
-                            enemyShip.ship.startAnimation(blinking);
-                            enemyInvulnerable = true;
-                        }
-                        if(!enemyShip.isAlive()) {
-                            endGame("WON");
-                        }
-                    }
                     SpaceInvader arrayInvaders[] = new SpaceInvader[spaceInvaders.size()];
                     spaceInvaders.toArray(arrayInvaders);
                     for (SpaceInvader invader : arrayInvaders) {
@@ -352,6 +264,10 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                 spaceInvaders.remove(invader);
                             }
                         }
+                    }
+                    if(spaceInvaders.size() == 0)
+                    {
+                        endGame("WIN");
                     }
                 }
             }
@@ -428,15 +344,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         switch (shipColor) {
             case 1:
                 myShip.setSource(R.drawable.spaceship);
-                enemyShip.setSource(R.drawable.enemy);
                 break;
             case 2:
                 myShip.setSource(R.drawable.spaceship_2);
-                enemyShip.setSource(R.drawable.spaceship_2_enemy);
                 break;
             case 3:
                 myShip.setSource(R.drawable.spaceship_3);
-                enemyShip.setSource(R.drawable.spaceship_3_enemy);
                 break;
         }
 
@@ -465,10 +378,4 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
-
-
-    //@Override
-    //public void onBackPressed() {
-
-    //}
 }

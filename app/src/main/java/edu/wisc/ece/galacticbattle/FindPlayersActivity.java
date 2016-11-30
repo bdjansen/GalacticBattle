@@ -70,6 +70,7 @@ public class FindPlayersActivity extends ListActivity {
         server.start();
 
 
+
         // Define the listener interface
        AdapterView.OnItemClickListener mListener = new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
@@ -85,6 +86,7 @@ public class FindPlayersActivity extends ListActivity {
 
                 client = new ClientThread(pickedDevice);
                 client.start();
+
 
             }
         };
@@ -112,6 +114,7 @@ public class FindPlayersActivity extends ListActivity {
         {
             myApp.setSocket(server.getSocket());
         }
+
 
         startActivity(mIntent);
     }

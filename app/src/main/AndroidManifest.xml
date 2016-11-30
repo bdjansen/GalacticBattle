@@ -29,6 +29,11 @@
             android:label="GameActivity" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
+            android:name=".CampaignActivity"
+            android:label="CampaignActivity" >
+        </activity>
+        <activity
             android:name=".FindPlayersActivity"
             android:label="FindPlayersActivity">
         </activity>

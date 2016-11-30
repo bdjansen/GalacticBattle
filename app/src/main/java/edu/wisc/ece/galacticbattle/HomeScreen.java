@@ -33,4 +33,11 @@ public class HomeScreen extends AppCompatActivity {
                 OptionsActivity.class);
         startActivity(mIntent);
     }
+
+    public void campaign(View v) {
+        // Go back to the main activity
+        Intent mIntent = new Intent(HomeScreen.this,
+                CampaignActivity.class);
+        startActivity(mIntent);
+    }
 }

@@ -1,5 +1,6 @@
 package edu.wisc.ece.galacticbattle;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Point;
@@ -7,15 +8,25 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.Display;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import java.util.ArrayList;
+import android.widget.ArrayAdapter;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 /**
  * Created by Blake on 10/17/2016.
@@ -25,9 +36,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     public final static String EXTRA_OUTCOME = "com.example.galacticbattle.OUTCOME";
     private Spaceship myShip;
     private Spaceship enemyShip;
+    private ArrayList<SpaceInvader> spaceInvaders;
     private ConnectedThread connectionThread;
 
     private int maxX;
+    private int maxY;
     private int shipSpeed;
     int counter = 0;
 
@@ -38,6 +51,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     public boolean canShoot = true;
     public boolean timing = false;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
 
     @Override
@@ -52,31 +70,53 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         Point size = new Point();
         mdisp.getSize(size);
         maxX = size.x;
-        int maxY = size.y;
-
-        System.out.println("x " + size.x + "y " + size.y + "\n");
+        maxY = size.y;
 
         ImageView myShipV = (ImageView) findViewById(R.id.myShip);
         ImageView enemyShipV = (ImageView) findViewById(R.id.enemyShip);
 
-        myShipV.layout((int) (maxX / 2 - maxX*.1041667),(int) (maxY - maxY*.11719),
-                (int) (maxX / 2 + maxX*.1041667),maxY);
-        enemyShipV.layout((int) (maxX / 2 - maxX*.1041667),0,
-                (int) (maxX / 2 + maxX*.1041667),(int) (maxY*.11719));
+
+        myShipV.setLayoutParams(new RelativeLayout.LayoutParams((int)(maxX * 0.1) , (int)(maxX * .1)));
+        enemyShipV.setLayoutParams(new RelativeLayout.LayoutParams((int)(maxX * 0.1) , (int)(maxX * .1)));
+
+
+        myShip = new Spaceship((float)0.5, (float)0.95, myShipV);//middle of ship location
+        enemyShip = new Spaceship((float)0.5, (float)0.05, enemyShipV);
+
+        myShipV.setX(maxX * (myShip.getX() - myShip.getWidthRadius()));
+        myShipV.setY(maxY * (myShip.getY() - myShip.getWidthRadius()));
+        enemyShipV.setX(maxX * (enemyShip.getX() - enemyShip.getWidthRadius()));
+        enemyShipV.setY(maxY * (enemyShip.getY() - enemyShip.getWidthRadius()));
 
         System.out.println("SEARCH THIS: MY VIEW SHIP (x,y) = (" + myShipV.getX() + "," + myShipV.getY() + ")");
         System.out.println("SEARCH THIS: ENEMY VIEW SHIP (x,y) = (" + enemyShipV.getX() + "," + enemyShipV.getY() + ")");
 
-        myShip = new Spaceship((int) (myShipV.getX() - maxX*.1041667), (int) myShipV.getY(), myShipV);
-        enemyShip = new Spaceship((int) (enemyShipV.getX() - maxX*.1041667),
-                (int) enemyShipV.getY(), enemyShipV);
+        spaceInvaders = new ArrayList<SpaceInvader>();
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        RelativeLayout gameLayout = (RelativeLayout) findViewById(R.id.layout);
+
+        for (int i = 0; i < 8; i++) {
+            ImageView currInvader = (ImageView) inflater.inflate(R.layout.space_invader_view, null);
+            currInvader.setId(1000 + i);
+            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams((int)(maxX * 0.1), (int)(maxX * 0.1));
+            currInvader.setLayoutParams(params);
+            gameLayout.addView(currInvader);
+            SpaceInvader newInvader = new SpaceInvader((((float)i) / 8) + (float)0.07, (float) 0.5, currInvader);//0.07 is a magic number
+            spaceInvaders.add(newInvader);
+            //currInvader.layout((int) (maxX * newInvader.getX() + (maxX / 32)), (int) (maxY * newInvader.getY() + maxX / 20),
+            //        (int) (maxX * newInvader.getX() + (maxX * 3 / 32)), (int) (maxY * newInvader.getY() - maxX / 20));
+            currInvader.setX((int)(maxX * (newInvader.getX() - newInvader.getWidthRadius())));
+            currInvader.setY((int)(maxY * (newInvader.getY() - newInvader.getHeightRadius())));
+            currInvader.requestLayout();
+        }
 
         loadUserData();
 
         ActionBar bar = getSupportActionBar();
         try {
             bar.hide();
-        } catch (java.lang.NullPointerException e) {
+        } catch (NullPointerException e) {
 
         }
 
@@ -93,9 +133,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             public void run() {
                 try {
                     while (true) {
-                        if (timing) {
+                        if (!canShoot) {
                             Thread.sleep(1000);
-                            timing = false;
                             canShoot = true;
                         }
                     }
@@ -112,26 +151,21 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             public void run() {
                 try {
                     while (true) {
-                        counter++;
                         Thread.sleep(1);
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Bullet current[] = new Bullet[enemyBullets.size()];
-                                enemyBullets.toArray(current);
+                                Bullet current[] = new Bullet[bullets.size()];
+                                bullets.toArray(current);
                                 for (int i = 0; i < current.length; i++) {
                                     current[i].move();
-                                    if (current[i].getY() > 2560) {
+                                    ImageView movedImage = current[i].image();
+                                    movedImage.setY((current[i].getY() - current[i].getHeightRadius())*maxY);
+                                    if (current[i].getY() < 0) {
                                         RelativeLayout layout =
                                                 (RelativeLayout) findViewById(R.id.layout);
                                         layout.removeView(current[i].image());
-                                        enemyBullets.remove(current[i]);
-                                    }
-                                    if(counter % 100 == 0) {
-                                        System.out.println("1 " + current[i].getX());
-                                        System.out.println(current[i].getY());
-                                        System.out.println(enemyShip.getX());
-                                        System.out.println(enemyShip.getY());
+                                        bullets.remove(current[i]);
                                     }
                                     shipHit();
                                     enemyHit();
@@ -145,6 +179,9 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         };
 
         bulletLogic.start();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     @Override
@@ -155,20 +192,21 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         switch (action) {
             case (MotionEvent.ACTION_DOWN):
                 if (canShoot) {
-                    System.out.println("Action was UP");
                     canShoot = false;
-                    timing = true;
                     ImageView v = new ImageView(this);
-                    Bullet shot = new Bullet((int) enemyShip.getX() + enemyShip.getWidthRadius() -
-                            enemyShip.getWidthRadius()/10, (int )enemyShip.getY() - enemyShip.getHeightRadius(),
-                            enemyShip.getWidthRadius()/10, enemyShip.getWidthRadius()*10/15, v);
+                    Bullet shot = new Bullet(myShip.getX(), myShip.getY() - myShip.getHeightRadius(), v);
                     shot.setSource();
+                    v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
+                    v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
+
+                    v.setLayoutParams(new RelativeLayout.LayoutParams((int)(shot.getWidthRadius() * 2 * maxX),
+                            (int)(shot.getHeightRadius()* 2 * maxY)));
+
                     RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
                     layout.addView(shot.image());
-                    enemyBullets.add(shot);
+                    bullets.add(shot);
                 } else {
                     System.out.println("Tapped but didn't shoot");
-                    System.out.println(enemyShip.getY());
                 }
                 return true;
             default:
@@ -192,7 +230,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         System.out.println("WE GOT HIT");
                         enemyBullets.remove(current);
                         myShip.hit();
-                        if(!myShip.isAlive()) {
+                        if (!myShip.isAlive()) {
                             endGame("LOST");
                         }
                     }
@@ -215,8 +253,24 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         System.out.println("HIT THE ENEMY");
                         bullets.remove(current);
                         enemyShip.hit();
-                        if(!enemyShip.isAlive()) {
+                        if (!enemyShip.isAlive()) {
                             endGame("WON");
+                        }
+                    }
+                    SpaceInvader arrayInvaders[] = new SpaceInvader[spaceInvaders.size()];
+                    spaceInvaders.toArray(arrayInvaders);
+                    for (SpaceInvader invader : arrayInvaders) {
+                        if (invader.isHit(current)) {
+                            RelativeLayout layout =
+                                    (RelativeLayout) findViewById(R.id.layout);
+                            layout.removeView(current.image());
+                            System.out.println("HIT THE INVADER");
+                            bullets.remove(current);
+                            invader.hit();
+                            if (!invader.isAlive()) {
+                                layout.removeView(invader.image());
+                                spaceInvaders.remove(invader);
+                            }
                         }
                     }
                 }
@@ -226,8 +280,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        int speed = 0;
-        int imageWidth = 300;
+        float speed = 0;
+        double imageWidth = 0.05;//width ratio of ship
 
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             int x = ((int) event.values[0]);
@@ -240,19 +294,19 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 case -7:
                 case -6:
                 case -5:
-                    speed = 10;
+                    speed = (float)0.001;
                     break;
                 case -4:
                 case -3:
                 case -2:
                 case -1:
-                    speed = 5;
+                    speed = (float)0.0005;
                     break;
                 case 1:
                 case 2:
                 case 3:
                 case 4:
-                    speed = 5;
+                    speed = (float)0.0005;
                     break;
                 case 5:
                 case 6:
@@ -260,17 +314,20 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 case 8:
                 case 9:
                 case 10:
-                    speed = 10;
+                    speed = (float)0.001;
                     break;
             }
 
+            ImageView shipView = myShip.image();
             if (x > 0 && Math.abs(x) > 1) {
-                if (myShip.getX() < maxX - (imageWidth + speed)) {
-                    myShip.setX((int) myShip.getX() + (speed + shipSpeed));
+                if (myShip.getX() < (1 - myShip.getWidthRadius())) {
+                    myShip.setX(myShip.getX() + (speed * shipSpeed));
+                    shipView.setX((myShip.getX() - myShip.getWidthRadius()) * maxX);
                 }
-            } else if(x <= 0 && Math.abs(x) > 1) {
-                if (myShip.getX() > speed) {
-                    myShip.setX((int) myShip.getX() - (speed + shipSpeed));
+            } else if (x <= 0 && Math.abs(x) > 1) {
+                if (myShip.getX() > myShip.getWidthRadius()) {
+                    myShip.setX(myShip.getX() - (speed * shipSpeed));
+                    shipView.setX((myShip.getX() - myShip.getWidthRadius()) * maxX);
                 }
             }
         }
@@ -330,9 +387,45 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("Game Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(client, getIndexApiAction());
+        client.disconnect();
+    }
+
 
     //@Override
-   //public void onBackPressed() {
+    //public void onBackPressed() {
 
-   //}
+    //}
 }

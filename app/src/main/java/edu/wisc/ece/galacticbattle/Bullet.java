@@ -9,22 +9,17 @@ import android.widget.RelativeLayout;
 public class Bullet {
     private float x;
     private float y;
-    private int widthRadius;
-    private int heightRadius;
+    private float widthRadius;
+    private float heightRadius;
 
     private ImageView bullet;
 
-    public Bullet(int x, int y, int halfWidth, int halfHeight, ImageView bullet) {
+    public Bullet(float x, float y, ImageView bullet) {
         this.x = x;
         this.y = y;
-        this.widthRadius = halfWidth;
-        this.heightRadius = halfHeight;
+        this.widthRadius = (float)0.00625;//1/160
+        this.heightRadius = (float)0.0375;//6 times as tall
         this.bullet = bullet;
-        bullet.setX(x);
-        bullet.setY(y);
-        bullet.setLayoutParams(new RelativeLayout.LayoutParams(widthRadius*2,
-                heightRadius*2));
-        bullet.layout(x - widthRadius, y - heightRadius, x + widthRadius, y + heightRadius);
     }
 
     public float getX() {
@@ -35,11 +30,17 @@ public class Bullet {
         return y;
     }
 
-    public int getWidthRadius() { return widthRadius; }
+    public float getWidthRadius() { return widthRadius; }
 
-    public int getHeightRadius() { return heightRadius; }
+    public float getHeightRadius() { return heightRadius; }
 
-    public void move() { bullet.setY(bullet.getY() + 1); y = bullet.getY(); };
+    public void move() {
+        this.y = this.y - (float)0.0005;
+        /*
+        bullet.setY(bullet.getY() - 1);
+        y = bullet.getY();
+        */
+    }
 
     public void setSource() { bullet.setImageResource(R.drawable.laser_bullet); }
 

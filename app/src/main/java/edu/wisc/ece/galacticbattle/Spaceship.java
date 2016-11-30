@@ -9,40 +9,39 @@ import java.util.ArrayList;
  * Created by Blake on 10/17/2016.
  */
 public class Spaceship {
-    private int x;
-    private int y;
-    private int widthRadius;
-    private int heightRadius;
+    private float x;
+    private float y;
+    private float widthRadius;
+    private float heightRadius;
     private int lives = 3;
 
     public ImageView ship;
 
-    public Spaceship(int x, int y, ImageView v) {
+    public Spaceship(float x, float y, ImageView v) {
         this.x = x;
         this.y = y;
-        this.widthRadius = 150;
-        this.heightRadius = 150;
+        this.widthRadius = (float)0.05;//1/20
+        this.heightRadius = (float)0.05;//1/20
         this.ship = v;
     }
 
-    public void setX(int x) {
-        this.x = x - 15;
-        ship.setX(x);
+    public void setX(float x) {
+        this.x = x;
     }
 
     public boolean isHit(Bullet b)
     {
-        if(b.getX() > x - b.getWidthRadius()
-                && b.getX() < x + 2*widthRadius + b.getWidthRadius()
-                && b.getY() > y - b.getHeightRadius()
-                && b.getY() < y + heightRadius + b.getHeightRadius()){
+        if(b.getX() > x - widthRadius - b.getWidthRadius()
+                && b.getX() < x + widthRadius + b.getWidthRadius()
+                && b.getY() > y - heightRadius - b.getHeightRadius()
+                && b.getY() < y + heightRadius - (b.getHeightRadius()/2)){//don't know why we need to subtract and use /2 here, but it looks the best
             return true;
         }
         return false;
     }
 
     public float getX(){
-        return ship.getX();
+        return this.x;
     }
 
     public void hit()
@@ -51,12 +50,12 @@ public class Spaceship {
     }
 
     public float getY() {
-        return ship.getY();
+        return this.y;
     }
 
-    public int getWidthRadius() { return widthRadius; }
+    public float getWidthRadius() { return widthRadius; }
 
-    public int getHeightRadius() { return heightRadius; }
+    public float getHeightRadius() { return heightRadius; }
 
     public boolean isAlive() {
         return lives > 0;
@@ -66,4 +65,6 @@ public class Spaceship {
     {
         ship.setImageResource(id);
     }
+
+    public ImageView image() {return this.ship;}
 }

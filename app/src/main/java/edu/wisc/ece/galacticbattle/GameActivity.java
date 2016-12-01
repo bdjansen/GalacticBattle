@@ -44,7 +44,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private int maxX;
     private int maxY;
     private int shipSpeed;
-    private GamePacket packet = new GamePacket();
+    private gamePacket packet = new gamePacket();
     private byte[] bytePacket = new byte[12];
     GameActivity activity = this;
 
@@ -244,35 +244,35 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Bullet current[] = new Bullet[bullets.size()];
-                                bullets.toArray(current);
-                                for (int i = 0; i < current.length; i++) {
-                                    current[i].move();
-                                    ImageView movedImage = current[i].image();
-                                    movedImage.setY((current[i].getY() - current[i].getHeightRadius())*maxY);
-                                    if (current[i].getY() < 0) {
-                                        RelativeLayout layout =
-                                                (RelativeLayout) findViewById(R.id.layout);
-                                        layout.removeView(current[i].image());
-                                        bullets.remove(current[i]);
-                                    }
-
-                                }
-                                Bullet currentEnemy[] = new Bullet[enemyBullets.size()];
-                                enemyBullets.toArray(currentEnemy);
-                                for (int i = 0; i < currentEnemy.length; i++) {
-                                    currentEnemy[i].moveEnemy();
-                                    ImageView movedImage = currentEnemy[i].image();
-                                    movedImage.setY((currentEnemy[i].getY() - currentEnemy[i].getHeightRadius())*maxY);
-                                    if (currentEnemy[i].getY() > maxY) {
-                                        RelativeLayout layout =
-                                                (RelativeLayout) findViewById(R.id.layout);
-                                        layout.removeView(currentEnemy[i].image());
-                                        enemyBullets.remove(currentEnemy[i]);
-                                    }
-                                }
-                                enemyHit();
-                                shipHit();
+//                                Bullet current[] = new Bullet[bullets.size()];
+//                                bullets.toArray(current);
+//                                for (int i = 0; i < current.length; i++) {
+//                                    current[i].move();
+//                                    ImageView movedImage = current[i].image();
+//                                    movedImage.setY((current[i].getY() - current[i].getHeightRadius())*maxY);
+//                                    if (current[i].getY() < 0) {
+//                                        RelativeLayout layout =
+//                                                (RelativeLayout) findViewById(R.id.layout);
+//                                        layout.removeView(current[i].image());
+//                                        bullets.remove(current[i]);
+//                                    }
+//
+//                                }
+//                                Bullet currentEnemy[] = new Bullet[enemyBullets.size()];
+//                                enemyBullets.toArray(currentEnemy);
+//                                for (int i = 0; i < currentEnemy.length; i++) {
+//                                    currentEnemy[i].moveEnemy();
+//                                    ImageView movedImage = currentEnemy[i].image();
+//                                    movedImage.setY((currentEnemy[i].getY() - currentEnemy[i].getHeightRadius())*maxY);
+//                                    if (currentEnemy[i].getY() > maxY) {
+//                                        RelativeLayout layout =
+//                                                (RelativeLayout) findViewById(R.id.layout);
+//                                        layout.removeView(currentEnemy[i].image());
+//                                        enemyBullets.remove(currentEnemy[i]);
+//                                    }
+//                                }
+//                                enemyHit();
+//                                shipHit();
                             }
                         });
                     }
@@ -296,15 +296,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                             for(int i = 0; i < 8; i++) {
                                 bytePacket[i] = location[i];
                             }
-//                            packet.setX(1 - value);
-//                            try {
-//                                //location = serialize(packet);
-//                                connectionThread.write(location);
-//                                //packet.setBulletX(-1);
-//                            } catch(IOException e) {
-//                                System.out.println("Couldn't Serialize\n");
-//                            }
-                            connectionThread.write(location);
+                            connectionThread.write(bytePacket);
                             for(int i = 0; i < 4; i++) {
                                 bytePacket[i + 8] = 0;
                             }

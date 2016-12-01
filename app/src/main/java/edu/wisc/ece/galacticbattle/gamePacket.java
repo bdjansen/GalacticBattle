@@ -3,13 +3,13 @@ package edu.wisc.ece.galacticbattle;
 /**
  * Created by Blake on 11/30/2016.
  */
-public class GamePacket implements java.io.Serializable {
+public class gamePacket implements java.io.Serializable {
     private float x = 0.5f;
     private float bulletX = -1;
     private int hit = 0;
     private int lost = 0;
 
-    public GamePacket() {
+    public gamePacket() {
     }
 
     public void setX(float f) {

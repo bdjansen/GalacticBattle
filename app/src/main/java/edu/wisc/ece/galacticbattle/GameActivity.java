@@ -63,19 +63,19 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             byte[] x = (byte[]) msg.obj;
             ByteBuffer reader = ByteBuffer.wrap(x);
             float shipX = reader.getFloat();
-//            int bullet = reader.getInt(8);
-//            if(bullet == 1) {
-//                    ImageView v = new ImageView(activity);
-//                    Bullet shot = new Bullet(enemyShip.getX(), enemyShip.getY() - enemyShip.getHeightRadius(), v);
-//                    shot.setSource();
-//                    v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
-//                    v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
-//                    v.setLayoutParams(new RelativeLayout.LayoutParams((int)(shot.getWidthRadius() * 2 * maxX),
-//                            (int)(shot.getHeightRadius()* 2 * maxY)));
-//                    RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
-//                    layout.addView(shot.image());
-//                    enemyBullets.add(shot);
-//              }
+            int bullet = reader.getInt(8);
+            if(bullet == 1) {
+                    ImageView v = new ImageView(activity);
+                    Bullet shot = new Bullet(enemyShip.getX(), enemyShip.getY() - enemyShip.getHeightRadius(), v);
+                    shot.setSource();
+                    v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
+                    v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
+                    v.setLayoutParams(new RelativeLayout.LayoutParams((int)(shot.getWidthRadius() * 2 * maxX),
+                            (int)(shot.getHeightRadius()* 2 * maxY)));
+                    RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
+                    layout.addView(shot.image());
+                    enemyBullets.add(shot);
+              }
               if(shipX > 0) {
                   ImageView shipView = enemyShip.image();
                   enemyShip.setX(shipX);
@@ -198,41 +198,41 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             }
         };
 
-        final Thread invulnerableThread = new Thread() {
-
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        if (invulnerable) {
-                            Thread.sleep(2500);
-                            invulnerable = false;
-                        }
-                    }
-                } catch (InterruptedException e) {
-                }
-            }
-        };
-
-        Thread enemyInvulnerableThread = new Thread() {
-
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        if (enemyInvulnerable) {
-                            Thread.sleep(2500);
-                            enemyInvulnerable = false;
-                        }
-                    }
-                } catch (InterruptedException e) {
-                }
-            }
-        };
+//        final Thread invulnerableThread = new Thread() {
+//
+//            @Override
+//            public void run() {
+//                try {
+//                    while (true) {
+//                        if (invulnerable) {
+//                            Thread.sleep(2500);
+//                            invulnerable = false;
+//                        }
+//                    }
+//                } catch (InterruptedException e) {
+//                }
+//            }
+//        };
+//
+//        Thread enemyInvulnerableThread = new Thread() {
+//
+//            @Override
+//            public void run() {
+//                try {
+//                    while (true) {
+//                        if (enemyInvulnerable) {
+//                            Thread.sleep(2500);
+//                            enemyInvulnerable = false;
+//                        }
+//                    }
+//                } catch (InterruptedException e) {
+//                }
+//            }
+//        };
 
         shootTimer.start();
-        invulnerableThread.start();
-        enemyInvulnerableThread.start();
+//        invulnerableThread.start();
+//        enemyInvulnerableThread.start();
 
         Thread bulletLogic = new Thread() {
 
@@ -353,12 +353,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void run() {
 
-                // Ship blink code
-                final Animation blinking = new AlphaAnimation(1, 0);
-                blinking.setDuration(500);
-                blinking.setInterpolator(new LinearInterpolator());
-                blinking.setRepeatCount(5);
-                blinking.setRepeatMode(Animation.REVERSE);
+//                // Ship blink code
+//                final Animation blinking = new AlphaAnimation(1, 0);
+//                blinking.setDuration(500);
+//                blinking.setInterpolator(new LinearInterpolator());
+//                blinking.setRepeatCount(5);
+//                blinking.setRepeatMode(Animation.REVERSE);
 
                 Bullet arrayBullets[] = new Bullet[enemyBullets.size()];
                 enemyBullets.toArray(arrayBullets);
@@ -370,7 +370,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         enemyBullets.remove(current);
                         if (!invulnerable) {
                             myShip.hit();
-                            myShip.ship.startAnimation(blinking);
+                            //myShip.ship.startAnimation(blinking);
                             invulnerable = true;
                         }
                         if(!myShip.isAlive()) {
@@ -387,11 +387,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void run() {
                 // Ship blink code
-                final Animation blinking = new AlphaAnimation(1, 0);
-                blinking.setDuration(500);
-                blinking.setInterpolator(new LinearInterpolator());
-                blinking.setRepeatCount(5);
-                blinking.setRepeatMode(Animation.REVERSE);
+//                final Animation blinking = new AlphaAnimation(1, 0);
+//                blinking.setDuration(500);
+//                blinking.setInterpolator(new LinearInterpolator());
+//                blinking.setRepeatCount(5);
+//                blinking.setRepeatMode(Animation.REVERSE);
 
                 Bullet arrayBullets[] = new Bullet[bullets.size()];
                 bullets.toArray(arrayBullets);
@@ -404,7 +404,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         bullets.remove(current);
                         if (!enemyInvulnerable) {
                             enemyShip.hit();
-                            enemyShip.ship.startAnimation(blinking);
+                            //enemyShip.ship.startAnimation(blinking);
                             enemyInvulnerable = true;
                         }
                         if(!enemyShip.isAlive()) {

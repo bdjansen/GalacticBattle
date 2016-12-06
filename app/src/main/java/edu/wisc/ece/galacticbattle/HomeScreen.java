@@ -25,6 +25,7 @@ public class HomeScreen extends AppCompatActivity {
         Intent mIntent = new Intent(HomeScreen.this,
                 FindPlayersActivity.class);
         startActivity(mIntent);
+        finish();
     }
 
     public void openOptions(View v) {
@@ -32,6 +33,7 @@ public class HomeScreen extends AppCompatActivity {
         Intent mIntent = new Intent(HomeScreen.this,
                 OptionsActivity.class);
         startActivity(mIntent);
+        finish();
     }
 
     public void campaign(View v) {
@@ -39,5 +41,6 @@ public class HomeScreen extends AppCompatActivity {
         Intent mIntent = new Intent(HomeScreen.this,
                 CampaignActivity.class);
         startActivity(mIntent);
+        finish();
     }
 }

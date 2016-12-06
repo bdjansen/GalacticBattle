@@ -40,7 +40,7 @@ public class FindPlayersActivity extends ListActivity {
         // Assign the adapter to ListView
         setListAdapter(mAdapter);
 
-
+        /**
         // Get the bluetooth adapter
         final BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
@@ -68,6 +68,7 @@ public class FindPlayersActivity extends ListActivity {
 
         server = new ServerThread();
         server.start();
+         */
 
 
 
@@ -76,7 +77,7 @@ public class FindPlayersActivity extends ListActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
 
-
+                /**
                 // Get the device MAC address, which is the last 17 chars in the View
                 String info = ((TextView) view).getText().toString();
                 String address = info.substring(info.length() - 17);
@@ -86,7 +87,7 @@ public class FindPlayersActivity extends ListActivity {
 
                 client = new ClientThread(pickedDevice);
                 client.start();
-
+                */
 
             }
         };
@@ -104,7 +105,7 @@ public class FindPlayersActivity extends ListActivity {
         Intent mIntent = new Intent(FindPlayersActivity.this,
                 GameActivity.class);
 
-
+        /**
         GalacticBattleApp myApp = (GalacticBattleApp)getApplicationContext();
         if (client != null && client.getSocket() != null)
         {
@@ -114,6 +115,7 @@ public class FindPlayersActivity extends ListActivity {
         {
             myApp.setSocket(server.getSocket());
         }
+         */
 
 
         startActivity(mIntent);

@@ -12,6 +12,7 @@ public class SpaceInvader {
     private float widthRadius;
     private float heightRadius;
     private int lives = 1;
+    boolean right;
 
     public ImageView spaceInvader;
 
@@ -23,6 +24,7 @@ public class SpaceInvader {
         this.widthRadius = (float)0.05;
         this.heightRadius = (float)0.05;
         this.spaceInvader = v;
+        right = true;
     }
 
     public void setX(float x) {
@@ -69,6 +71,8 @@ public class SpaceInvader {
 
     public float getHeightRadius() { return heightRadius; }
 
+    public boolean getRight() { return right; }
+
     public boolean isAlive() {
         return lives > 0;
     }
@@ -79,5 +83,30 @@ public class SpaceInvader {
     }
 
     public ImageView image(){return this.spaceInvader;}
+
+    public void moveLeft() {
+        if (this.x >= 0.05)
+        {
+            this.x = this.x - (float) 0.0005;
+        }
+        else
+        {
+            right = true;
+        }
+        /*
+        bullet.setY(bullet.getY() - 1);
+        y = bullet.getY();
+        */
+    }
+    public void moveRight() {
+        if (this.x <= 0.85)
+        {
+            this.x = this.x + (float) 0.0005;
+        }
+        else
+        {
+            right = false;
+        }
+    }
 }
 

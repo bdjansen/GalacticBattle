@@ -100,11 +100,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_screen);
-
+        /**
         GalacticBattleApp myApp = (GalacticBattleApp) getApplicationContext();
         connectionThread = new ConnectedThread(myApp.getSocket(), mHandler);
         connectionThread.start();
-
+        */
         Display mdisp = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         mdisp.getSize(size);
@@ -290,7 +290,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         };
 
         bulletLogic.start();
-        writeLogic.start();
+        //writeLogic.start();
     }
 
     @Override

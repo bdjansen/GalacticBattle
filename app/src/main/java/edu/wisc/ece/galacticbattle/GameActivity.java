@@ -28,6 +28,8 @@ import android.widget.RelativeLayout;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Random;
+
 
 
 /**
@@ -53,6 +55,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
     private ArrayList<Bullet> enemyBullets = new ArrayList<Bullet>();
+    private Bullet bulletsArray[] = new Bullet[20];
+    private Bullet enemyBulletsArray[] = new Bullet[20];
+    private Bullet current[] = new Bullet[20];
+    private Bullet currentEnemy[] = new Bullet[20];
+    private SpaceInvader invadersArray[] = new SpaceInvader[10];
 
     public boolean canShoot = true;
     public boolean invulnerable = false;
@@ -66,11 +73,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             final float shipX = reader.getFloat();
             int bullet = reader.getInt(8);
             if(bullet == 1) {
-                    final ImageView v = new ImageView(activity);
-                    final Bullet shot = new Bullet(enemyShip.getX(), enemyShip.getY() - enemyShip.getHeightRadius(), v);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
+                    ImageView v = new ImageView(activity);
+                    Bullet shot = new Bullet(enemyShip.getX(), enemyShip.getY() - enemyShip.getHeightRadius(), v);
                         shot.setSource();
                         v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
                         v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
@@ -78,33 +82,28 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                 (int)(shot.getHeightRadius()* 2 * maxY)));
                         RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
                         layout.addView(shot.image());
-                    }
-                });
                     enemyBullets.add(shot);
               }
               if(shipX > 0) {
-                  final ImageView shipView = enemyShip.image();
-                  runOnUiThread(new Runnable() {
-                      @Override
-                      public void run() {
+                  ImageView shipView = enemyShip.image();
                           enemyShip.setX(shipX);
                           shipView.setX((enemyShip.getX() - enemyShip.getWidthRadius()) * maxX);
-                      }
-                  });
               }
         }
     };
+
+    private Random randSeedGenerator = new Random(System.currentTimeMillis());
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_screen);
-        /**
+
         GalacticBattleApp myApp = (GalacticBattleApp) getApplicationContext();
         connectionThread = new ConnectedThread(myApp.getSocket(), mHandler);
         connectionThread.start();
-        */
+
         Display mdisp = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         mdisp.getSize(size);
@@ -221,42 +220,64 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void run() {
                 try {
+                    int counter = 0;
                     while (true) {
                         Thread.sleep(1);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Bullet current[] = new Bullet[bullets.size()];
+                        counter++;
+                        final int threadCounter = counter;
                                 bullets.toArray(current);
                                 for (int i = 0; i < current.length; i++) {
+                                    if(current[i] == null)
+                                        continue;
                                     current[i].move();
-                                    ImageView movedImage = current[i].image();
-                                    movedImage.setY((current[i].getY() - current[i].getHeightRadius())*maxY);
+                                    final ImageView movedImage = current[i].image();
+                                    final Bullet b = current[i];
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            movedImage.setY((b.getY() - b.getHeightRadius())*maxY);
+                                        }
+                                    });
                                     if (current[i].getY() < 0) {
-                                        RelativeLayout layout =
+                                        final RelativeLayout layout =
                                                 (RelativeLayout) findViewById(R.id.layout);
-                                        layout.removeView(current[i].image());
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                layout.removeView(b.image());
+                                            }
+                                        });
                                         bullets.remove(current[i]);
                                     }
 
                                 }
-                                Bullet currentEnemy[] = new Bullet[enemyBullets.size()];
                                 enemyBullets.toArray(currentEnemy);
                                 for (int i = 0; i < currentEnemy.length; i++) {
+                                    if(currentEnemy[i] == null)
+                                        continue;
                                     currentEnemy[i].moveEnemy();
-                                    ImageView movedImage = currentEnemy[i].image();
-                                    movedImage.setY((currentEnemy[i].getY() - currentEnemy[i].getHeightRadius())*maxY);
+                                    final ImageView movedImage = currentEnemy[i].image();
+                                    final Bullet b = currentEnemy[i];
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            movedImage.setY((b.getY() - b.getHeightRadius())*maxY);
+                                        }
+                                    });
                                     if (currentEnemy[i].getY() > maxY) {
-                                        RelativeLayout layout =
+                                        final RelativeLayout layout =
                                                 (RelativeLayout) findViewById(R.id.layout);
-                                        layout.removeView(currentEnemy[i].image());
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                layout.removeView(b.image());
+                                            }
+                                        });
                                         enemyBullets.remove(currentEnemy[i]);
                                     }
                                 }
-                                enemyHit();
-                                shipHit();
-                            }
-                        });
+                                    enemyHit();
+                                    shipHit();
                     }
                 } catch (InterruptedException e) {
                 }
@@ -290,7 +311,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         };
 
         bulletLogic.start();
-        //writeLogic.start();
+        writeLogic.start();
     }
 
     @Override
@@ -331,28 +352,37 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
 
     private void shipHit() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+                // Ship blink code
+//                final Animation blinking = new AlphaAnimation(1, 0);
+//                blinking.setDuration(500);
+//                blinking.setInterpolator(new LinearInterpolator());
+//                blinking.setRepeatCount(5);
+//                blinking.setRepeatMode(Animation.REVERSE);
 
-//                // Ship blink code
-                final Animation blinking = new AlphaAnimation(1, 0);
-                blinking.setDuration(500);
-                blinking.setInterpolator(new LinearInterpolator());
-                blinking.setRepeatCount(5);
-                blinking.setRepeatMode(Animation.REVERSE);
-
-                Bullet arrayBullets[] = new Bullet[enemyBullets.size()];
-                enemyBullets.toArray(arrayBullets);
-                for (Bullet current : arrayBullets) {
+                enemyBullets.toArray(enemyBulletsArray);
+                for (Bullet current : enemyBulletsArray) {
+                    if (current == null)
+                        continue;
                     if (myShip.isHit(current)) {
-                        RelativeLayout layout =
+
+                        final RelativeLayout layout =
                                 (RelativeLayout) findViewById(R.id.layout);
-                        layout.removeView(current.image());
+                        final Bullet b = current;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                layout.removeView(b.image());
+                            }
+                        });
                         enemyBullets.remove(current);
                         if (!invulnerable) {
                             myShip.hit();
-                            myShip.ship.startAnimation(blinking);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // myShip.ship.startAnimation(blinking);
+                                }
+                            });
                             invulnerable = true;
                         }
                         if(!myShip.isAlive()) {
@@ -360,58 +390,78 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         }
                     }
                 }
-            }
-        });
     }
 
     private void enemyHit() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
                  // Ship blink code
-                final Animation blinking = new AlphaAnimation(1, 0);
-                blinking.setDuration(500);
-                blinking.setInterpolator(new LinearInterpolator());
-                blinking.setRepeatCount(5);
-                blinking.setRepeatMode(Animation.REVERSE);
+//                final Animation blinking = new AlphaAnimation(1, 0);
+//                blinking.setDuration(500);
+//                blinking.setInterpolator(new LinearInterpolator());
+//                blinking.setRepeatCount(5);
+//                blinking.setRepeatMode(Animation.REVERSE);
 
-                Bullet arrayBullets[] = new Bullet[bullets.size()];
-                bullets.toArray(arrayBullets);
-                for (Bullet current : arrayBullets) {
+                bullets.toArray(bulletsArray);
+                for (Bullet current : bulletsArray) {
+                    if (current == null) {
+                        continue;
+                    }
                     if (enemyShip.isHit(current)) {
-                        RelativeLayout layout =
+                        final RelativeLayout layout =
                                 (RelativeLayout) findViewById(R.id.layout);
-                        layout.removeView(current.image());
+
+                        final Bullet b = current;
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                layout.removeView(b.image());
+                            }
+                        });
                         System.out.println("HIT THE ENEMY");
                         bullets.remove(current);
                         if (!enemyInvulnerable) {
                             enemyShip.hit();
-                            enemyShip.ship.startAnimation(blinking);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // enemyShip.ship.startAnimation(blinking);
+                                }
+                            });
                             enemyInvulnerable = true;
                         }
                         if(!enemyShip.isAlive()) {
                             endGame("WON");
                         }
                     }
-                    SpaceInvader arrayInvaders[] = new SpaceInvader[spaceInvaders.size()];
-                    spaceInvaders.toArray(arrayInvaders);
-                    for (SpaceInvader invader : arrayInvaders) {
+                    spaceInvaders.toArray(invadersArray);
+                    for (SpaceInvader invader : invadersArray) {
+                        if(invader == null)
+                            continue;
                         if (invader.isHit(current)) {
-                            RelativeLayout layout =
+                            final RelativeLayout layout =
                                     (RelativeLayout) findViewById(R.id.layout);
-                            layout.removeView(current.image());
+                            final Bullet b = current;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    layout.removeView(b.image());
+                                }
+                            });
                             System.out.println("HIT THE INVADER");
                             bullets.remove(current);
                             invader.hit();
+                            final SpaceInvader i = invader;
                             if (!invader.isAlive()) {
-                                layout.removeView(invader.image());
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        layout.removeView(i.image());
+                                    }
+                                });
                                 spaceInvaders.remove(invader);
                             }
                         }
                     }
                 }
-            }
-        });
     }
 
     @Override
@@ -453,28 +503,17 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     break;
             }
 
-            final ImageView shipView = myShip.image();
-            final float finalSpeed = speed;
+            ImageView shipView = myShip.image();
             if (x > 0 && Math.abs(x) > 1) {
                 if (myShip.getX() < (1 - myShip.getWidthRadius())) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            myShip.setX(myShip.getX() + (finalSpeed * shipSpeed));
+                            myShip.setX(myShip.getX() + (speed * shipSpeed));
                             shipView.setX((myShip.getX() - myShip.getWidthRadius()) * maxX);
-                        }
-                    });
                 }
             } else if (x <= 0 && Math.abs(x) > 1) {
                 if (myShip.getX() > myShip.getWidthRadius()) {
                     if (myShip.getX() < (1 - myShip.getWidthRadius())) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                myShip.setX(myShip.getX() - (finalSpeed * shipSpeed));
+                                myShip.setX(myShip.getX() - (speed * shipSpeed));
                                 shipView.setX((myShip.getX() - myShip.getWidthRadius()) * maxX);
-                            }
-                        });
                     }
                 }
             }
@@ -529,6 +568,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         Intent intent = new Intent(this, EndScreenActivity.class);
         intent.putExtra(EXTRA_OUTCOME, message);
         connectionThread.cancel();
+        writeLogic.interrupt();
+        bulletLogic.interrupt();
+        invulnerableThread.interrupt();
+        enemyInvulnerableThread.interrupt();
+        shootTimer.interrupt();
+        sensorManager.unregisterListener(this);
         startActivity(intent);
         finish();
     }
@@ -542,4 +587,10 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     //public void onBackPressed() {
 
     //}
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+    }
+
 }

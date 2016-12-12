@@ -6,6 +6,7 @@ import android.widget.RelativeLayout;
 /**
  * Created by Blake on 10/17/2016.
  */
+
 public class Bullet {
     private float x;
     private float y;

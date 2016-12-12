@@ -19,21 +19,10 @@ public class SpaceInvader {
     public SpaceInvader(float x, float y, ImageView v) {
         this.x = x;
         this.y = y;
-        //v.setX(x);
-        //v.setY(y);
         this.widthRadius = (float)0.05;
         this.heightRadius = (float)0.05;
         this.spaceInvader = v;
         right = true;
-    }
-
-    public void setX(float x) {
-        this.x = x - 15;
-        spaceInvader.setX(x);
-    }
-
-    public void setY(float y) {
-        this.y = y;
     }
 
     public boolean isHit(Bullet b)

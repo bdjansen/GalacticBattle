@@ -8,6 +8,7 @@ import java.util.ArrayList;
 /**
  * Created by Blake on 10/17/2016.
  */
+
 public class Spaceship {
     private float x;
     private float y;

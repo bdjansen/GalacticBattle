@@ -61,6 +61,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private Bullet currentEnemy[] = new Bullet[20];
     private SpaceInvader invadersArray[] = new SpaceInvader[10];
 
+    private final Animation blinking = new AlphaAnimation(1, 0);
+
     RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
 
     public boolean canShoot = true;
@@ -110,6 +112,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         mdisp.getSize(size);
         maxX = size.x;
         maxY = size.y;
+
+        // Ship blink code
+        blinking.setDuration(500);
+        blinking.setInterpolator(new LinearInterpolator());
+        blinking.setRepeatCount(5);
+        blinking.setRepeatMode(Animation.REVERSE);
 
         ImageView myShipV = (ImageView) findViewById(R.id.myShip);
         ImageView enemyShipV = (ImageView) findViewById(R.id.enemyShip);
@@ -347,12 +355,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
 
     private void shipHit() {
-                // Ship blink code
-//                final Animation blinking = new AlphaAnimation(1, 0);
-//                blinking.setDuration(500);
-//                blinking.setInterpolator(new LinearInterpolator());
-//                blinking.setRepeatCount(5);
-//                blinking.setRepeatMode(Animation.REVERSE);
 
                 enemyBullets.toArray(enemyBulletsArray);
                 for (Bullet current : enemyBulletsArray) {
@@ -373,7 +375,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    // myShip.ship.startAnimation(blinking);
+                                    myShip.ship.startAnimation(blinking);
                                 }
                             });
                             invulnerable = true;
@@ -386,12 +388,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
     private void enemyHit() {
-                 // Ship blink code
-//                final Animation blinking = new AlphaAnimation(1, 0);
-//                blinking.setDuration(500);
-//                blinking.setInterpolator(new LinearInterpolator());
-//                blinking.setRepeatCount(5);
-//                blinking.setRepeatMode(Animation.REVERSE);
 
                 bullets.toArray(bulletsArray);
                 for (Bullet current : bulletsArray) {
@@ -414,7 +410,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    // enemyShip.ship.startAnimation(blinking);
+                                    enemyShip.ship.startAnimation(blinking);
                                 }
                             });
                             enemyInvulnerable = true;

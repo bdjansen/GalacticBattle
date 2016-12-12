@@ -54,6 +54,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
     private ArrayList<Bullet> enemyBullets = new ArrayList<Bullet>();
 
+    RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
+
     public boolean canShoot = true;
     public boolean invulnerable = false;
     public boolean enemyInvulnerable = false;
@@ -76,7 +78,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
                         v.setLayoutParams(new RelativeLayout.LayoutParams((int)(shot.getWidthRadius() * 2 * maxX),
                                 (int)(shot.getHeightRadius()* 2 * maxY)));
-                        RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
+                        layout = (RelativeLayout) findViewById(R.id.layout);
                         layout.addView(shot.image());
                     }
                 });
@@ -131,14 +133,13 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         spaceInvaders = new ArrayList<SpaceInvader>();
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        RelativeLayout gameLayout = (RelativeLayout) findViewById(R.id.layout);
 
         for (int i = 0; i < 8; i++) {
             ImageView currInvader = (ImageView) inflater.inflate(R.layout.space_invader_view, null);
             currInvader.setId(1000 + i);
             ViewGroup.LayoutParams params = new ViewGroup.LayoutParams((int)(maxX * 0.1), (int)(maxX * 0.1));
             currInvader.setLayoutParams(params);
-            gameLayout.addView(currInvader);
+            layout.addView(currInvader);
             SpaceInvader newInvader = new SpaceInvader((((float)i) / 8) + (float)0.07, (float) 0.5, currInvader);//0.07 is a magic number
             spaceInvaders.add(newInvader);
             //currInvader.layout((int) (maxX * newInvader.getX() + (maxX / 32)), (int) (maxY * newInvader.getY() + maxX / 20),
@@ -233,8 +234,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                     ImageView movedImage = current[i].image();
                                     movedImage.setY((current[i].getY() - current[i].getHeightRadius())*maxY);
                                     if (current[i].getY() < 0) {
-                                        RelativeLayout layout =
-                                                (RelativeLayout) findViewById(R.id.layout);
                                         layout.removeView(current[i].image());
                                         bullets.remove(current[i]);
                                     }
@@ -247,8 +246,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                     ImageView movedImage = currentEnemy[i].image();
                                     movedImage.setY((currentEnemy[i].getY() - currentEnemy[i].getHeightRadius())*maxY);
                                     if (currentEnemy[i].getY() > maxY) {
-                                        RelativeLayout layout =
-                                                (RelativeLayout) findViewById(R.id.layout);
                                         layout.removeView(currentEnemy[i].image());
                                         enemyBullets.remove(currentEnemy[i]);
                                     }
@@ -316,7 +313,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     v.setLayoutParams(new RelativeLayout.LayoutParams((int)(shot.getWidthRadius() * 2 * maxX),
                             (int)(shot.getHeightRadius()* 2 * maxY)));
 
-                    RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
                     layout.addView(shot.image());
                     bullets.add(shot);
                 } else {
@@ -346,8 +342,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 enemyBullets.toArray(arrayBullets);
                 for (Bullet current : arrayBullets) {
                     if (myShip.isHit(current)) {
-                        RelativeLayout layout =
-                                (RelativeLayout) findViewById(R.id.layout);
                         layout.removeView(current.image());
                         enemyBullets.remove(current);
                         if (!invulnerable) {
@@ -379,8 +373,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 bullets.toArray(arrayBullets);
                 for (Bullet current : arrayBullets) {
                     if (enemyShip.isHit(current)) {
-                        RelativeLayout layout =
-                                (RelativeLayout) findViewById(R.id.layout);
                         layout.removeView(current.image());
                         System.out.println("HIT THE ENEMY");
                         bullets.remove(current);
@@ -397,8 +389,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     spaceInvaders.toArray(arrayInvaders);
                     for (SpaceInvader invader : arrayInvaders) {
                         if (invader.isHit(current)) {
-                            RelativeLayout layout =
-                                    (RelativeLayout) findViewById(R.id.layout);
                             layout.removeView(current.image());
                             System.out.println("HIT THE INVADER");
                             bullets.remove(current);

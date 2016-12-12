@@ -131,43 +131,6 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_GAME);
 
-        //This thread is set to update the timer as long as a boolean is set
-        //It also uses the variables to do the logic corresponding to the timer value
-        Thread shootTimer = new Thread() {
-
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        if (!canShoot) {
-                            Thread.sleep(1000);
-                            canShoot = true;
-                        }
-                    }
-                } catch (InterruptedException e) {
-                }
-            }
-        };
-
-        final Thread invulnerableThread = new Thread() {
-
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        if (invulnerable) {
-                            Thread.sleep(2500);
-                            invulnerable = false;
-                        }
-                    }
-                } catch (InterruptedException e) {
-                }
-            }
-        };
-
-        shootTimer.start();
-        invulnerableThread.start();
-
         Thread bulletLogic = new Thread() {
 
             @Override
@@ -268,6 +231,7 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                     RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
                     layout.addView(shot.image());
                     bullets.add(shot);
+                    timerHandler.postDelayed(rTimer, 1000);
                 } else {
                     System.out.println("Tapped but didn't shoot");
                 }
@@ -297,6 +261,7 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                                 myShip.hit();
                                 myShip.ship.startAnimation(blinking);
                                 invulnerable = true;
+                                invulnerableHandler.postDelayed(rInvulnerable, 2500);
                             }
                             if (!myShip.isAlive()) {
                                 endGame("LOST");

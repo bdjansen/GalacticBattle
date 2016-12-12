@@ -590,6 +590,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onDestroy()
     {
+        // j
         super.onDestroy();
     }
 

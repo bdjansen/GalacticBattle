@@ -9,6 +9,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -51,6 +52,23 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
     private Bullet [] myBulletsArray2 = new Bullet[10];
     private Bullet [] enemyBulletsArray = new Bullet[10];
     private SpaceInvader [] spaceInvadersArray = new SpaceInvader[10];
+    private final Handler timerHandler = new Handler();
+    private final Runnable rTimer = new Runnable() {
+        @Override
+        public void run() {
+            if (!canShoot)
+                canShoot = true;
+        }
+    };
+
+    private final Handler invulnerableHandler = new Handler();
+    private final Runnable rInvulnerable = new Runnable() {
+        @Override
+        public void run() {
+            if (invulnerable)
+                invulnerable = false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

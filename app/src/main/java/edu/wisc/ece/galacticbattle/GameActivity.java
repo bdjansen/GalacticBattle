@@ -63,11 +63,37 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     private final Animation blinking = new AlphaAnimation(1, 0);
 
-    RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
+    RelativeLayout layout;
 
     public boolean canShoot = true;
     public boolean invulnerable = false;
     public boolean enemyInvulnerable = false;
+    private final Handler timerHandler = new Handler();
+    private final Runnable rTimer = new Runnable() {
+        @Override
+        public void run() {
+            if (!canShoot)
+                canShoot = true;
+        }
+    };
+
+    private final Handler invulnerableHandler = new Handler();
+    private final Runnable rInvulnerable = new Runnable() {
+        @Override
+        public void run() {
+            if (invulnerable)
+                invulnerable = false;
+        }
+    };
+
+    private final Handler eInvulnerableHandler = new Handler();
+    private final Runnable rEInvulnerable = new Runnable() {
+        @Override
+        public void run() {
+            if (enemyInvulnerable)
+                enemyInvulnerable = false;
+        }
+    };
 
     private final Handler mHandler = new Handler() {
         @Override
@@ -139,6 +165,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         spaceInvaders = new ArrayList<SpaceInvader>();
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        layout = (RelativeLayout) findViewById(R.id.layout);
 
         for (int i = 0; i < 8; i++) {
             ImageView currInvader = (ImageView) inflater.inflate(R.layout.space_invader_view, null);
@@ -169,59 +196,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_GAME);
 
-        //This thread is set to update the timer as long as a boolean is set
-        //It also uses the variables to do the logic corresponding to the timer value
-        shootTimer = new Thread() {
-
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        if (!canShoot) {
-                            Thread.sleep(1000);
-                            canShoot = true;
-                        }
-                    }
-                } catch (InterruptedException e) {
-                }
-            }
-        };
-
-        invulnerableThread = new Thread() {
-
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        if (invulnerable) {
-                            Thread.sleep(2500);
-                            invulnerable = false;
-                        }
-                    }
-                } catch (InterruptedException e) {
-                }
-            }
-        };
-
-        enemyInvulnerableThread = new Thread() {
-
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        if (enemyInvulnerable) {
-                            Thread.sleep(2500);
-                            enemyInvulnerable = false;
-                        }
-                    }
-                } catch (InterruptedException e) {
-                }
-            }
-        };
-
-        shootTimer.start();
-        invulnerableThread.start();
-        enemyInvulnerableThread.start();
 
         bulletLogic = new Thread() {
 
@@ -343,6 +317,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
                     layout.addView(shot.image());
                     bullets.add(shot);
+                    timerHandler.postDelayed(rTimer, 1000);
                 } else {
                     System.out.println("Tapped but didn't shoot");
                 }
@@ -379,6 +354,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                 }
                             });
                             invulnerable = true;
+                            invulnerableHandler.postDelayed(rInvulnerable, 2500);
                         }
                         if(!myShip.isAlive()) {
                             endGame("LOST");
@@ -414,6 +390,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                 }
                             });
                             enemyInvulnerable = true;
+                            eInvulnerableHandler.postDelayed(rEInvulnerable, 2500);
                         }
                         if(!enemyShip.isAlive()) {
                             endGame("WON");
@@ -554,11 +531,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         message = message + " versus";
         intent.putExtra(EXTRA_OUTCOME, message);
         connectionThread.cancel();
+        connectionThread.interrupt();
         writeLogic.interrupt();
         bulletLogic.interrupt();
-        invulnerableThread.interrupt();
-        enemyInvulnerableThread.interrupt();
-        shootTimer.interrupt();
+        connectionThread = null;
+        writeLogic = null;
+        bulletLogic = null;
         sensorManager.unregisterListener(this);
         startActivity(intent);
     }
@@ -575,7 +553,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onDestroy()
     {
-        // j
+        //
         super.onDestroy();
     }
 

@@ -46,6 +46,12 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
     public boolean canShoot = true;
     public boolean invulnerable = false;
 
+    private final Animation blinking = new AlphaAnimation(1, 0);
+    private Bullet [] myBulletsArray = new Bullet[10];
+    private Bullet [] myBulletsArray2 = new Bullet[10];
+    private Bullet [] enemyBulletsArray = new Bullet[10];
+    private SpaceInvader [] spaceInvadersArray = new SpaceInvader[10];
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +73,11 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
         myShipV.setY(maxY * (myShip.getY() - myShip.getWidthRadius()));
 
         System.out.println("SEARCH THIS: MY VIEW SHIP (x,y) = (" + myShipV.getX() + "," + myShipV.getY() + ")");
+
+        blinking.setDuration(500);
+        blinking.setInterpolator(new LinearInterpolator());
+        blinking.setRepeatCount(5);
+        blinking.setRepeatMode(Animation.REVERSE);
 
         spaceInvaders = new ArrayList<SpaceInvader>();
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -149,20 +160,21 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Bullet current[] = new Bullet[bullets.size()];
-                                bullets.toArray(current);
-                                for (int i = 0; i < current.length; i++) {
-                                    current[i].move();
-                                    ImageView movedImage = current[i].image();
-                                    movedImage.setY((current[i].getY() - current[i].getHeightRadius())*maxY);
-                                    if (current[i].getY() < 0) {
-                                        RelativeLayout layout =
-                                                (RelativeLayout) findViewById(R.id.layout);
-                                        layout.removeView(current[i].image());
-                                        bullets.remove(current[i]);
+                                bullets.toArray(myBulletsArray);
+                                for (int i = 0; i < myBulletsArray.length; i++) {
+                                    if(myBulletsArray[i] != null) {
+                                        myBulletsArray[i].move();
+                                        ImageView movedImage = myBulletsArray[i].image();
+                                        movedImage.setY((myBulletsArray[i].getY() - myBulletsArray[i].getHeightRadius()) * maxY);
+                                        if (myBulletsArray[i].getY() < 0) {
+                                            RelativeLayout layout =
+                                                    (RelativeLayout) findViewById(R.id.layout);
+                                            layout.removeView(myBulletsArray[i].image());
+                                            bullets.remove(myBulletsArray[i]);
+                                        }
+                                        shipHit();
+                                        enemyHit();
                                     }
-                                    shipHit();
-                                    enemyHit();
                                 }
                             }
                         });
@@ -182,36 +194,29 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                SpaceInvader invaders[] = new SpaceInvader[spaceInvaders.size()];
-                                spaceInvaders.toArray(invaders);
-                                for (int i = 0; i < invaders.length; i++) {
-                                    ImageView movedImage = invaders[i].image();
-                                    if (invaders[i].getRight())
-                                    {
-                                        invaders[i].moveRight();
-                                        if (invaders[i].getRight())
-                                        {
-                                            movedImage.setX((invaders[i].getX() + invaders[i].getWidthRadius())*maxX);
+
+                                spaceInvaders.toArray(spaceInvadersArray);
+                                for (int i = 0; i < spaceInvadersArray.length; i++) {
+                                    if (spaceInvadersArray[i] != null) {
+                                        ImageView movedImage = spaceInvadersArray[i].image();
+                                        if (spaceInvadersArray[i].getRight()) {
+                                            spaceInvadersArray[i].moveRight();
+                                            if (spaceInvadersArray[i].getRight()) {
+                                                movedImage.setX((spaceInvadersArray[i].getX() + spaceInvadersArray[i].getWidthRadius()) * maxX);
+                                            } else {
+                                                movedImage.setX((spaceInvadersArray[i].getX() - spaceInvadersArray[i].getWidthRadius()) * maxX);
+                                            }
+                                        } else {
+                                            spaceInvadersArray[i].moveLeft();
+                                            if (spaceInvadersArray[i].getRight()) {
+                                                movedImage.setX((spaceInvadersArray[i].getX() + spaceInvadersArray[i].getWidthRadius()) * maxX);
+                                            } else {
+                                                movedImage.setX((spaceInvadersArray[i].getX() - spaceInvadersArray[i].getWidthRadius()) * maxX);
+                                            }
                                         }
-                                        else
-                                        {
-                                            movedImage.setX((invaders[i].getX() - invaders[i].getWidthRadius())*maxX);
-                                        }
+                                        shipHit();
+                                        enemyHit();
                                     }
-                                    else
-                                    {
-                                        invaders[i].moveLeft();
-                                        if (invaders[i].getRight())
-                                        {
-                                            movedImage.setX((invaders[i].getX() + invaders[i].getWidthRadius())*maxX);
-                                        }
-                                        else
-                                        {
-                                            movedImage.setX((invaders[i].getX() - invaders[i].getWidthRadius())*maxX);
-                                        }
-                                    }
-                                    shipHit();
-                                    enemyHit();
                                 }
                             }
                         });
@@ -261,29 +266,23 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
             @Override
             public void run() {
 
-                // Ship blink code
-                final Animation blinking = new AlphaAnimation(1, 0);
-                blinking.setDuration(500);
-                blinking.setInterpolator(new LinearInterpolator());
-                blinking.setRepeatCount(5);
-                blinking.setRepeatMode(Animation.REVERSE);
-
-                Bullet arrayBullets[] = new Bullet[enemyBullets.size()];
-                enemyBullets.toArray(arrayBullets);
-                for (Bullet current : arrayBullets) {
-                    if (myShip.isHit(current)) {
-                        RelativeLayout layout =
-                                (RelativeLayout) findViewById(R.id.layout);
-                        layout.removeView(current.image());
-                        System.out.println("WE GOT HIT");
-                        enemyBullets.remove(current);
-                        if (!invulnerable) {
-                            myShip.hit();
-                            myShip.ship.startAnimation(blinking);
-                            invulnerable = true;
-                        }
-                        if(!myShip.isAlive()) {
-                            endGame("LOST");
+                enemyBullets.toArray(enemyBulletsArray);
+                for (Bullet current : enemyBulletsArray) {
+                    if (current != null) {
+                        if (myShip.isHit(current)) {
+                            RelativeLayout layout =
+                                    (RelativeLayout) findViewById(R.id.layout);
+                            layout.removeView(current.image());
+                            System.out.println("WE GOT HIT");
+                            enemyBullets.remove(current);
+                            if (!invulnerable) {
+                                myShip.hit();
+                                myShip.ship.startAnimation(blinking);
+                                invulnerable = true;
+                            }
+                            if (!myShip.isAlive()) {
+                                endGame("LOST");
+                            }
                         }
                     }
                 }
@@ -295,22 +294,22 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Bullet arrayBullets[] = new Bullet[bullets.size()];
-                bullets.toArray(arrayBullets);
-                for (Bullet current : arrayBullets) {
-                    SpaceInvader arrayInvaders[] = new SpaceInvader[spaceInvaders.size()];
-                    spaceInvaders.toArray(arrayInvaders);
-                    for (SpaceInvader invader : arrayInvaders) {
-                        if (invader.isHit(current)) {
-                            RelativeLayout layout =
-                                    (RelativeLayout) findViewById(R.id.layout);
-                            layout.removeView(current.image());
-                            System.out.println("HIT THE INVADER");
-                            bullets.remove(current);
-                            invader.hit();
-                            if (!invader.isAlive()) {
-                                layout.removeView(invader.image());
-                                spaceInvaders.remove(invader);
+                bullets.toArray(myBulletsArray2);
+                for (Bullet current : myBulletsArray2) {
+                    spaceInvaders.toArray(spaceInvadersArray);
+                    for (SpaceInvader invader : spaceInvadersArray) {
+                        if (current != null && invader != null) {
+                            if (invader.isHit(current)) {
+                                RelativeLayout layout =
+                                        (RelativeLayout) findViewById(R.id.layout);
+                                layout.removeView(current.image());
+                                System.out.println("HIT THE INVADER");
+                                bullets.remove(current);
+                                invader.hit();
+                                if (!invader.isAlive()) {
+                                    layout.removeView(invader.image());
+                                    spaceInvaders.remove(invader);
+                                }
                             }
                         }
                     }
@@ -362,16 +361,29 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                     break;
             }
 
-            ImageView shipView = myShip.image();
+            final ImageView shipView = myShip.image();
+            final float finalSpeed = speed;
             if (x > 0 && Math.abs(x) > 1) {
                 if (myShip.getX() < (1 - myShip.getWidthRadius())) {
-                    myShip.setX(myShip.getX() + (speed * shipSpeed));
-                    shipView.setX((myShip.getX() - myShip.getWidthRadius()) * maxX);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            myShip.setX(myShip.getX() + (finalSpeed * shipSpeed));
+                            shipView.setX((myShip.getX() - myShip.getWidthRadius()) * maxX);
+                        }
+                    });
                 }
             } else if (x <= 0 && Math.abs(x) > 1) {
                 if (myShip.getX() > myShip.getWidthRadius()) {
-                    myShip.setX(myShip.getX() - (speed * shipSpeed));
-                    shipView.setX((myShip.getX() - myShip.getWidthRadius()) * maxX);
+                    if (myShip.getX() < (1 - myShip.getWidthRadius())) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                myShip.setX(myShip.getX() - (finalSpeed * shipSpeed));
+                                shipView.setX((myShip.getX() - myShip.getWidthRadius()) * maxX);
+                            }
+                        });
+                    }
                 }
             }
         }
@@ -420,11 +432,19 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
 
     public void endGame(String message) {
         Intent intent = new Intent(this, EndScreenActivity.class);
+        message = message + " campaign";
         intent.putExtra(EXTRA_OUTCOME, message);
         startActivity(intent);
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        sensorManager.unregisterListener(this);
+        super.onDestroy();
     }
 }

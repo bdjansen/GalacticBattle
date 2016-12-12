@@ -23,6 +23,7 @@
         android:layout_height="match_parent"
         android:layout_weight="2"
         android:text="Go Back To Find Players"
+        android:id="@+id/findPlayers"
         android:onClick="findPlayers"/>
     <Button
         android:layout_width="match_parent"

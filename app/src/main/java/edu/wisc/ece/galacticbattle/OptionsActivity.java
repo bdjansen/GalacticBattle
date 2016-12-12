@@ -1,5 +1,6 @@
 package edu.wisc.ece.galacticbattle;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,9 +13,6 @@ import android.widget.SeekBar;
  */
 
 public class OptionsActivity extends AppCompatActivity {
-    private boolean changedSpeed = false;
-    private boolean changedColors = false;
-    private boolean clearedStats = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,10 +69,13 @@ public class OptionsActivity extends AppCompatActivity {
         // Officially commit the changes to the shared preferences
         mEditor.commit();
 
-        this.onBackPressed();
+        Intent intent = new Intent(this, HomeScreen.class);
+        startActivity(intent);
     }
 
     public void cancelChanges(View v){
-        this.onBackPressed();
+        Intent intent = new Intent(this, HomeScreen.class);
+        startActivity(intent);
     }
+
 }

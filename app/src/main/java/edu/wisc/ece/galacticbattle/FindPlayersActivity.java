@@ -71,10 +71,12 @@ public class FindPlayersActivity extends ListActivity {
 
 
 
+
         // Define the listener interface
        AdapterView.OnItemClickListener mListener = new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
+
 
                 // Get the device MAC address, which is the last 17 chars in the View
                 String info = ((TextView) view).getText().toString();
@@ -85,6 +87,7 @@ public class FindPlayersActivity extends ListActivity {
 
                 client = new ClientThread(pickedDevice);
                 client.start();
+
 
             }
         };
@@ -102,6 +105,7 @@ public class FindPlayersActivity extends ListActivity {
         Intent mIntent = new Intent(FindPlayersActivity.this,
                 GameActivity.class);
 
+
         GalacticBattleApp myApp = (GalacticBattleApp)getApplicationContext();
         if (client != null && client.getSocket() != null)
         {
@@ -111,6 +115,7 @@ public class FindPlayersActivity extends ListActivity {
         {
             myApp.setSocket(server.getSocket());
         }
+
 
 
         startActivity(mIntent);

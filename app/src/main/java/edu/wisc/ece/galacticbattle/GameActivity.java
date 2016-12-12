@@ -82,7 +82,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
                         v.setLayoutParams(new RelativeLayout.LayoutParams((int)(shot.getWidthRadius() * 2 * maxX),
                                 (int)(shot.getHeightRadius()* 2 * maxY)));
-                        layout = (RelativeLayout) findViewById(R.id.layout);
                         layout.addView(shot.image());
                     enemyBullets.add(shot);
               }
@@ -240,8 +239,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                         }
                                     });
                                     if (current[i].getY() < 0) {
-                                        final RelativeLayout layout =
-                                                (RelativeLayout) findViewById(R.id.layout);
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
@@ -266,8 +263,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                         }
                                     });
                                     if (currentEnemy[i].getY() > maxY) {
-                                        final RelativeLayout layout =
-                                                (RelativeLayout) findViewById(R.id.layout);
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
@@ -365,8 +360,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         continue;
                     if (myShip.isHit(current)) {
 
-                        final RelativeLayout layout =
-                                (RelativeLayout) findViewById(R.id.layout);
                         final Bullet b = current;
                         runOnUiThread(new Runnable() {
                             @Override
@@ -406,8 +399,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         continue;
                     }
                     if (enemyShip.isHit(current)) {
-                        final RelativeLayout layout =
-                                (RelativeLayout) findViewById(R.id.layout);
 
                         final Bullet b = current;
                         runOnUiThread(new Runnable() {
@@ -437,8 +428,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         if(invader == null)
                             continue;
                         if (invader.isHit(current)) {
-                            final RelativeLayout layout =
-                                    (RelativeLayout) findViewById(R.id.layout);
                             final Bullet b = current;
                             runOnUiThread(new Runnable() {
                                 @Override

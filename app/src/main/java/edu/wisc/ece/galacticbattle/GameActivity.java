@@ -574,6 +574,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     break;
             }
 
+            //hey
             /*
             switch (x) {
                 case -10:

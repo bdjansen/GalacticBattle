@@ -4,5 +4,6 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="blueThumb">#0000FF</color>
+    <color name="black">#000000</color>
     <color name="backgroundGray">#C4C4C4</color>
 </resources>

@@ -38,6 +38,7 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
     private int maxX;
     private int maxY;
     private int shipSpeed;
+    private int level;
 
     private SensorManager sensorManager;
 
@@ -70,6 +71,8 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
         }
     };
 
+    private Thread spaceInvadersMove;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +83,7 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
         mdisp.getSize(size);
         maxX = size.x;
         maxY = size.y;
+        level = 0;
 
         ImageView myShipV = (ImageView) findViewById(R.id.myShip);
 
@@ -108,10 +112,8 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
             ViewGroup.LayoutParams params = new ViewGroup.LayoutParams((int)(maxX * 0.1), (int)(maxX * 0.1));
             currInvader.setLayoutParams(params);
             gameLayout.addView(currInvader);
-            SpaceInvader newInvader = new SpaceInvader((((float)i) / 11) + (float)0.07, (((float)i) / 11) + (float)0.07, currInvader);//0.07 is a magic number
+            SpaceInvader newInvader = new SpaceInvader((((float)i) / 11) + (float)0.07, (((float)i) / 11) + (float)0.07, currInvader, true);//0.07 is a magic number
             spaceInvaders.add(newInvader);
-            //currInvader.layout((int) (maxX * newInvader.getX() + (maxX / 32)), (int) (maxY * newInvader.getY() + maxX / 20),
-            //        (int) (maxX * newInvader.getX() + (maxX * 3 / 32)), (int) (maxY * newInvader.getY() - maxX / 20));
             currInvader.setX((int)(maxX * (newInvader.getX() - newInvader.getWidthRadius())));
             currInvader.setY((int)(maxY * (newInvader.getY() - newInvader.getHeightRadius())));
             currInvader.requestLayout();
@@ -165,7 +167,7 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
             }
         };
 
-        Thread spaceInvadersMove = new Thread() {
+        spaceInvadersMove = new Thread() {
 
             @Override
             public void run() {
@@ -184,14 +186,10 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                                             spaceInvadersArray[i].moveRight();
                                             if (spaceInvadersArray[i].getRight()) {
                                                 movedImage.setX((spaceInvadersArray[i].getX() + spaceInvadersArray[i].getWidthRadius()) * maxX);
-                                            } else {
-                                                movedImage.setX((spaceInvadersArray[i].getX() - spaceInvadersArray[i].getWidthRadius()) * maxX);
                                             }
                                         } else {
                                             spaceInvadersArray[i].moveLeft();
-                                            if (spaceInvadersArray[i].getRight()) {
-                                                movedImage.setX((spaceInvadersArray[i].getX() + spaceInvadersArray[i].getWidthRadius()) * maxX);
-                                            } else {
+                                            if (!spaceInvadersArray[i].getRight()) {
                                                 movedImage.setX((spaceInvadersArray[i].getX() - spaceInvadersArray[i].getWidthRadius()) * maxX);
                                             }
                                         }
@@ -264,6 +262,7 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                                 invulnerableHandler.postDelayed(rInvulnerable, 2500);
                             }
                             if (!myShip.isAlive()) {
+                                level++;
                                 endGame("LOST");
                             }
                         }
@@ -298,6 +297,7 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                     }
                     if(spaceInvaders.size() == 0)
                     {
+                        level++;
                         endGame("WIN");
                     }
                 }
@@ -358,7 +358,7 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                 }
             } else if (x <= 0 && Math.abs(x) > 1) {
                 if (myShip.getX() > myShip.getWidthRadius()) {
-                    if (myShip.getX() < (1 - myShip.getWidthRadius())) {
+
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -366,7 +366,6 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                                 shipView.setX((myShip.getX() - myShip.getWidthRadius()) * maxX);
                             }
                         });
-                    }
                 }
             }
         }
@@ -414,10 +413,177 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
     }
 
     public void endGame(String message) {
-        Intent intent = new Intent(this, EndScreenActivity.class);
-        message = message + " campaign";
-        intent.putExtra(EXTRA_OUTCOME, message);
-        startActivity(intent);
+        if (level == 1)
+        {
+            spaceInvadersMove.interrupt();
+            levelTwo();
+        }
+        else if (level == 2) {
+            spaceInvadersMove.interrupt();
+            levelThree();
+        }
+        else
+        {
+            Intent intent = new Intent(this, EndScreenActivity.class);
+            message = message + " campaign";
+            intent.putExtra(EXTRA_OUTCOME, message);
+            startActivity(intent);
+        }
+    }
+
+    public void levelTwo()
+    {
+        spaceInvaders = new ArrayList<SpaceInvader>();
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        RelativeLayout gameLayout = (RelativeLayout) findViewById(R.id.layout);
+        boolean right;
+
+        for (int i = 0; i < 8; i++) {
+            if (i <= 3)
+            {
+                right = true;
+            }
+            else
+            {
+                right = false;
+            }
+            ImageView currInvader = (ImageView) inflater.inflate(R.layout.space_invader_view, null);
+            currInvader.setId(1000 + i);
+            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams((int)(maxX * 0.1), (int)(maxX * 0.1));
+            currInvader.setLayoutParams(params);
+            gameLayout.addView(currInvader);
+            SpaceInvader newInvader = new SpaceInvader((float) 0.45, (((float)i) / 11) + (float)0.07, currInvader, right);//0.07 is a magic number
+            spaceInvaders.add(newInvader);
+            currInvader.setX((int)(maxX * (newInvader.getX() - newInvader.getWidthRadius())));
+            currInvader.setY((int)(maxY * (newInvader.getY() - newInvader.getHeightRadius())));
+            currInvader.requestLayout();
+        }
+
+        spaceInvadersMove = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        Thread.sleep(1);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                spaceInvaders.toArray(spaceInvadersArray);
+                                for (int i = 0; i < spaceInvadersArray.length; i++) {
+                                    if (spaceInvadersArray[i] != null) {
+                                        ImageView movedImage = spaceInvadersArray[i].image();
+                                        if (spaceInvadersArray[i].getRight()) {
+                                            spaceInvadersArray[i].moveRight();
+                                            if (spaceInvadersArray[i].getRight()) {
+                                                movedImage.setX((spaceInvadersArray[i].getX() + spaceInvadersArray[i].getWidthRadius()) * maxX);
+                                            }
+                                        } else {
+                                            spaceInvadersArray[i].moveLeft();
+                                            if (!spaceInvadersArray[i].getRight()) {
+                                                movedImage.setX((spaceInvadersArray[i].getX() - spaceInvadersArray[i].getWidthRadius()) * maxX);
+                                            }
+                                        }
+                                        shipHit();
+                                        enemyHit();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+        spaceInvadersMove.start();
+    }
+
+    public void levelThree()
+    {
+        spaceInvaders = new ArrayList<SpaceInvader>();
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+        RelativeLayout gameLayout = (RelativeLayout) findViewById(R.id.layout);
+        boolean right;
+
+        for (int i = 0; i < 8; i++) {
+            if (i % 2 == 0)
+            {
+                right = true;
+            }
+            else
+            {
+                right = false;
+            }
+            ImageView currInvader = (ImageView) inflater.inflate(R.layout.space_invader_view, null);
+            currInvader.setId(1000 + i);
+            ViewGroup.LayoutParams params = new ViewGroup.LayoutParams((int)(maxX * 0.1), (int)(maxX * 0.1));
+            currInvader.setLayoutParams(params);
+            gameLayout.addView(currInvader);
+            SpaceInvader newInvader = new SpaceInvader((float) 0.45, (((float)i) / 11) + (float)0.07, currInvader, right);//0.07 is a magic number
+            spaceInvaders.add(newInvader);
+            currInvader.setX((int)(maxX * (newInvader.getX() - newInvader.getWidthRadius())));
+            currInvader.setY((int)(maxY * (newInvader.getY() - newInvader.getHeightRadius())));
+            currInvader.requestLayout();
+        }
+
+        spaceInvadersMove = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    while (true) {
+                        Thread.sleep(1);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+
+                                spaceInvaders.toArray(spaceInvadersArray);
+                                for (int i = 0; i < spaceInvadersArray.length; i++) {
+                                    if (spaceInvadersArray[i] != null) {
+                                        if (i <= 2) {
+                                            ImageView movedImage = spaceInvadersArray[i].image();
+                                            if (spaceInvadersArray[i].getRight()) {
+                                                spaceInvadersArray[i].moveRight();
+                                                if (spaceInvadersArray[i].getRight()) {
+                                                    movedImage.setX((spaceInvadersArray[i].getX() + spaceInvadersArray[i].getWidthRadius()) * maxX);
+                                                }
+                                            } else {
+                                                spaceInvadersArray[i].moveLeft();
+                                                if (!spaceInvadersArray[i].getRight()) {
+                                                    movedImage.setX((spaceInvadersArray[i].getX() - spaceInvadersArray[i].getWidthRadius()) * maxX);
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            ImageView movedImage = spaceInvadersArray[i].image();
+                                            if (!spaceInvadersArray[i].getRight()) {
+                                                spaceInvadersArray[i].moveLeft();
+                                                if (!spaceInvadersArray[i].getRight()) {
+                                                    movedImage.setX((spaceInvadersArray[i].getX() - spaceInvadersArray[i].getWidthRadius()) * maxX);
+                                                }
+                                            } else {
+                                                spaceInvadersArray[i].moveRight();
+                                                if (spaceInvadersArray[i].getRight()) {
+                                                    movedImage.setX((spaceInvadersArray[i].getX() + spaceInvadersArray[i].getWidthRadius()) * maxX);
+                                                }
+                                            }
+                                        }
+                                        shipHit();
+                                        enemyHit();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+        spaceInvadersMove.start();
     }
 
     @Override

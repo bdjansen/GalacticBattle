@@ -16,13 +16,13 @@ public class SpaceInvader {
 
     public ImageView spaceInvader;
 
-    public SpaceInvader(float x, float y, ImageView v) {
+    public SpaceInvader(float x, float y, ImageView v, boolean right) {
         this.x = x;
         this.y = y;
         this.widthRadius = (float)0.05;
         this.heightRadius = (float)0.05;
         this.spaceInvader = v;
-        right = true;
+        this.right = right;
     }
 
     public boolean isHit(Bullet b)
@@ -76,7 +76,7 @@ public class SpaceInvader {
     public void moveLeft() {
         if (this.x >= 0.05)
         {
-            this.x = this.x - (float) 0.0005;
+            this.x = this.x - (float) 0.00025;
         }
         else
         {
@@ -90,7 +90,7 @@ public class SpaceInvader {
     public void moveRight() {
         if (this.x <= 0.85)
         {
-            this.x = this.x + (float) 0.0005;
+            this.x = this.x + (float) 0.00025;
         }
         else
         {

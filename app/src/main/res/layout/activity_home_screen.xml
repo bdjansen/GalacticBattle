@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:weightSum="6"
+    android:background="@color/black">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent" android:weightSum="8"
     android:layout_marginTop="150dp" android:layout_marginBottom="50dp"
-    android:layout_marginLeft="75dp" android:layout_marginRight="75dp">
+    android:layout_marginLeft="75dp" android:layout_marginRight="75dp"
+    >
 
     <ImageView android:id="@+id/Logo"
         android:layout_height="match_parent"
@@ -37,4 +42,5 @@
         android:onClick="openOptions">
     </Button>
 
+</LinearLayout>
 </LinearLayout>

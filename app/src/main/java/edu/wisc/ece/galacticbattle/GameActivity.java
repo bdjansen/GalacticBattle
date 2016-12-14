@@ -119,9 +119,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }
     };
 
-    private Random randSeedGenerator = new Random(System.currentTimeMillis());
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -171,7 +168,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             ViewGroup.LayoutParams params = new ViewGroup.LayoutParams((int)(maxX * 0.1), (int)(maxX * 0.1));
             currInvader.setLayoutParams(params);
             layout.addView(currInvader);
-            SpaceInvader newInvader = new SpaceInvader((((float)i) / 8) + (float)0.07, (float) 0.5, currInvader);//0.07 is a magic number
+            SpaceInvader newInvader = new SpaceInvader((((float)i) / 8) + (float)0.07, (float) 0.5, currInvader, true);//0.07 is a magic number
             spaceInvaders.add(newInvader);
             //currInvader.layout((int) (maxX * newInvader.getX() + (maxX / 32)), (int) (maxY * newInvader.getY() + maxX / 20),
             //        (int) (maxX * newInvader.getX() + (maxX * 3 / 32)), (int) (maxY * newInvader.getY() - maxX / 20));

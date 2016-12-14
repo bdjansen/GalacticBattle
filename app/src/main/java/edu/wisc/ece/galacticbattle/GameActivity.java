@@ -19,6 +19,7 @@ import android.text.Layout;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
@@ -148,7 +149,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         myShipV.setLayoutParams(new RelativeLayout.LayoutParams((int)(maxX * 0.1) , (int)(maxX * .1)));
         enemyShipV.setLayoutParams(new RelativeLayout.LayoutParams((int)(maxX * 0.1) , (int)(maxX * .1)));
 
-        myShip = new Spaceship((float)0.5, (float)0.95, myShipV);//middle of ship location
+        myShip = new Spaceship((float)0.5, (float)1, myShipV);//middle of ship location
         enemyShip = new Spaceship((float)0.5, (float)0.05, enemyShipV);
 
         myShipV.setX(maxX * (myShip.getX() - myShip.getWidthRadius()));
@@ -180,6 +181,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }
 
         loadUserData();
+
+
+        View decorView = getWindow().getDecorView();
+        // Hide the status bar.
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
 
         ActionBar bar = getSupportActionBar();
         try {
@@ -431,6 +438,145 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             int x = ((int) event.values[0]);
             x = -(x);
 
+            switch(shipSpeed){
+                case 1:
+                    switch (x) {
+                        case -10:
+                        case -9:
+                        case -8:
+                            speed = (float)0.008;
+                            break;
+                        case -7:
+                        case -6:
+                        case -5:
+
+                        case -4:
+                        case -3:
+                            speed = (float)0.004;
+                            break;
+                        case -2:
+                        case -1:
+
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+
+                        case 5:
+                        case 6:
+                            speed = (float)0.004;
+                            break;
+                        case 7:
+                        case 8:
+                        case 9:
+                        case 10:
+                            speed = (float)0.008;
+                            break;
+                    }
+                    break;
+                case 2:
+                    switch (x) {
+                        case -10:
+                        case -9:
+                        case -8:
+                        case -7:
+                        case -6:
+                        case -5:
+                            speed = (float)0.008;
+                            break;
+                        case -4:
+                        case -3:
+                        case -2:
+                        case -1:
+                            speed = (float)0.004;
+                            break;
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                            speed = (float)0.004;
+                            break;
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8:
+                        case 9:
+                        case 10:
+                            speed = (float)0.008;
+                            break;
+                    }
+                    break;
+                case 3:
+                    switch (x) {
+                        case -10:
+                        case -9:
+                        case -8:
+                        case -7:
+                        case -6:
+                        case -5:
+
+                        case -4:
+                            speed = (float)0.008;
+                            break;
+                        case -3:
+                        case -2:
+                        case -1:
+                            speed = (float)0.004;
+                            break;
+                        case 1:
+                        case 2:
+                        case 3:
+                            speed = (float)0.004;
+                            break;
+                        case 4:
+
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8:
+                        case 9:
+                        case 10:
+                            speed = (float)0.008;
+                            break;
+                    }
+                    break;
+                case 4:
+                    switch (x) {
+                        case -10:
+                        case -9:
+                        case -8:
+                        case -7:
+                        case -6:
+                        case -5:
+
+                        case -4:
+                        case -3:
+                            speed = (float)0.008;
+                            break;
+                        case -2:
+                        case -1:
+                            speed = (float)0.004;
+                            break;
+                        case 1:
+                        case 2:
+                            speed = (float)0.004;
+                            break;
+                        case 3:
+                        case 4:
+
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8:
+                        case 9:
+                        case 10:
+                            speed = (float)0.008;
+                            break;
+                    }
+                    break;
+            }
+
+            /*
             switch (x) {
                 case -10:
                 case -9:
@@ -461,20 +607,19 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     speed = (float)0.001;
                     break;
             }
+            */
 
             ImageView shipView = myShip.image();
             if (x > 0 && Math.abs(x) > 1) {
                 if (myShip.getX() < (1 - myShip.getWidthRadius())) {
-                            myShip.setX(myShip.getX() + (speed * shipSpeed));
-                            shipView.setX((myShip.getX() - myShip.getWidthRadius()) * maxX);
+                        myShip.setX(myShip.getX() + speed);
+                        shipView.setX((myShip.getX() - myShip.getWidthRadius()) * maxX);
                 }
             } else if (x <= 0 && Math.abs(x) > 1) {
                 if (myShip.getX() > myShip.getWidthRadius()) {
-                    if (myShip.getX() < (1 - myShip.getWidthRadius())) {
-                                myShip.setX(myShip.getX() - (speed * shipSpeed));
-                                shipView.setX((myShip.getX() - myShip.getWidthRadius()) * maxX);
+                        myShip.setX(myShip.getX() - speed );
+                        shipView.setX((myShip.getX() - myShip.getWidthRadius()) * maxX);
                     }
-                }
             }
         }
     }
@@ -509,16 +654,16 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         switch (shipSpeed / 25) {
             case 0:
-                shipSpeed = 0;
+                shipSpeed = 1;
                 break;
             case 1:
-                shipSpeed = 4;
+                shipSpeed = 2;
                 break;
             case 2:
-                shipSpeed = 8;
+                shipSpeed = 3;
                 break;
             case 3:
-                shipSpeed = 12;
+                shipSpeed = 4;
                 break;
         }
     }

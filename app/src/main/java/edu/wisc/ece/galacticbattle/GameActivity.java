@@ -8,14 +8,12 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Layout;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -48,7 +46,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private int shipSpeed;
     private gamePacket packet = new gamePacket();
     private byte[] bytePacket = new byte[1024];
-    Thread shootTimer, invulnerableThread, enemyInvulnerableThread, writeLogic, bulletLogic;
+    Thread writeLogic, bulletLogic;
     GameActivity activity = this;
 
     private SensorManager sensorManager;
@@ -104,7 +102,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             int bullet = reader.getInt(8);
             if(bullet == 1) {
                     ImageView v = new ImageView(activity);
-                    Bullet shot = new Bullet(enemyShip.getX(), enemyShip.getY() - enemyShip.getHeightRadius(), v);
+                    Bullet shot = new Bullet(enemyShip.getX(), enemyShip.getY() + enemyShip.getHeightRadius(), v);
                         shot.setSource();
                         v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
                         v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
@@ -271,7 +269,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     while (true) {
                         countWrite++;
                         Thread.sleep(1);
-                        if(countWrite % 15 == 0) {
+                        if(countWrite % 10 == 0) {
                             float value = 1 - myShip.getX();
                             byte[] location = ByteBuffer.allocate(8).putFloat(value).array();
                             for(int i = 0; i < 8; i++) {
@@ -473,10 +471,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 }
             } else if (x <= 0 && Math.abs(x) > 1) {
                 if (myShip.getX() > myShip.getWidthRadius()) {
-                    if (myShip.getX() < (1 - myShip.getWidthRadius())) {
                                 myShip.setX(myShip.getX() - (speed * shipSpeed));
                                 shipView.setX((myShip.getX() - myShip.getWidthRadius()) * maxX);
-                    }
                 }
             }
         }

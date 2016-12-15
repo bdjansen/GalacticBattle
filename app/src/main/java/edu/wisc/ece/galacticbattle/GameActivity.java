@@ -108,28 +108,30 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
-            byte[] x = (byte[]) msg.obj;
-            ByteBuffer reader = ByteBuffer.wrap(x);
-            final float shipX = reader.getFloat();
-            int bullet = reader.getInt(8);
-            if(bullet == 1 && enemyShoot) {
-                enemyShoot = false;
+            if(msg.what == 0) {
+                byte[] x = (byte[]) msg.obj;
+                ByteBuffer reader = ByteBuffer.wrap(x);
+                final float shipX = reader.getFloat();
+                int bullet = reader.getInt(8);
+                if (bullet == 1 && enemyShoot) {
+                    enemyShoot = false;
                     ImageView v = new ImageView(activity);
                     Bullet shot = new Bullet(enemyShip.getX(), enemyShip.getY() + enemyShip.getHeightRadius(), v);
-                        shot.setSource();
-                        v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
-                        v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
-                        v.setLayoutParams(new RelativeLayout.LayoutParams((int)(shot.getWidthRadius() * 2 * maxX),
-                                (int)(shot.getHeightRadius()* 2 * maxY)));
-                        layout.addView(shot.image());
+                    shot.setSource();
+                    v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
+                    v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
+                    v.setLayoutParams(new RelativeLayout.LayoutParams((int) (shot.getWidthRadius() * 2 * maxX),
+                            (int) (shot.getHeightRadius() * 2 * maxY)));
+                    layout.addView(shot.image());
                     enemyBullets.add(shot);
                     enemyTimerHandler.postDelayed(enemyTimer, 1000);
-              }
-              if(shipX > 0) {
-                  ImageView shipView = enemyShip.image();
-                          enemyShip.setX(shipX);
-                          shipView.setX((enemyShip.getX() - enemyShip.getWidthRadius()) * maxX);
-              }
+                }
+                if (shipX > 0) {
+                    ImageView shipView = enemyShip.image();
+                    enemyShip.setX(shipX);
+                    shipView.setX((enemyShip.getX() - enemyShip.getWidthRadius()) * maxX);
+                }
+            }
         }
     };
 

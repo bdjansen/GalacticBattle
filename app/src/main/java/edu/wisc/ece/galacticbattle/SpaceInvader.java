@@ -33,13 +33,6 @@ public class SpaceInvader {
                 && b.getY() < y + heightRadius - b.getHeightRadius()){//don't know why we need to subtract here
                 return true;
         }
-//        if(b.getX() > ship.getX() - b.getWidthRadius()
-//                && b.getX() < ship.getX() + widthRadius*2 + b.getWidthRadius()
-//                && b.getY() > ship.getY() - heightRadius - b.getHeightRadius()
-//                && b.getY() < ship.getY() + heightRadius + b.getHeightRadius()){
-//            return true;
-//        }
-
         return false;
     }
 
@@ -57,7 +50,6 @@ public class SpaceInvader {
     }
 
     public float getWidthRadius() { return widthRadius; }
-
     public float getHeightRadius() { return heightRadius; }
 
     public boolean getRight() { return right; }
@@ -70,7 +62,6 @@ public class SpaceInvader {
     {
         spaceInvader.setImageResource(id);
     }
-
     public ImageView image(){return this.spaceInvader;}
 
     public void moveLeft() {
@@ -82,10 +73,6 @@ public class SpaceInvader {
         {
             right = true;
         }
-        /*
-        bullet.setY(bullet.getY() - 1);
-        y = bullet.getY();
-        */
     }
     public void moveRight() {
         if (this.x <= 0.95)

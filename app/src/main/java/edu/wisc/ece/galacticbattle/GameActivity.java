@@ -24,47 +24,58 @@ import android.view.animation.LinearInterpolator;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Random;
 
 
 
 /**
  * Created by Blake on 10/17/2016.
+ * This class handles the entirety of the multiplayer game.  It goes through the ships moving,
+ * shooting bullets, writing out bluetooth data, and making players invulnerable.
  */
 
 public class GameActivity extends AppCompatActivity implements SensorEventListener {
+    // This string says whether the user won or lost
     public final static String EXTRA_OUTCOME = "com.example.galacticbattle.OUTCOME";
+
+    // These objects are the characters in the game
     private Spaceship myShip;
     private Spaceship enemyShip;
     private ArrayList<SpaceInvader> spaceInvaders;
-    private ConnectedThread connectionThread;
 
+    // These variables are used for bluetooth data
+    private ConnectedThread connectionThread;
+    private gamePacket packet = new gamePacket();
+    private byte[] bytePacket = new byte[1024];
+    private int counterWriteInt = 0;
+
+    // Screen size and ship speed
     private int maxX;
     private int maxY;
     private int shipSpeed;
-    private gamePacket packet = new gamePacket();
-    private byte[] bytePacket = new byte[1024];
+
     Thread writeLogic, bulletLogic;
     GameActivity activity = this;
 
+    // Sensor for moving the ship back and forth
     private SensorManager sensorManager;
 
-    private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
-    private ArrayList<Bullet> enemyBullets = new ArrayList<Bullet>();
+    // Theses arraylists and arrays handle the bullets and space invader's data
+    private ArrayList<Bullet> bullets = new ArrayList<>();
+    private ArrayList<Bullet> enemyBullets = new ArrayList<>();
     private Bullet bulletsArray[] = new Bullet[20];
     private Bullet enemyBulletsArray[] = new Bullet[20];
     private Bullet current[] = new Bullet[20];
     private Bullet currentEnemy[] = new Bullet[20];
     private SpaceInvader invadersArray[] = new SpaceInvader[10];
-    private int counterWriteInt = 0;
 
+    // invulnerability animation
     private final Animation blinking = new AlphaAnimation(1, 0);
 
     RelativeLayout layout;
 
+    // Booleans and runnables to handle invulnerability and shooting
     public boolean canShoot = true;
     public boolean invulnerable = false;
     public boolean enemyInvulnerable = false;
@@ -105,15 +116,22 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }
     };
 
+    // Bluetooth handler.  Processes the data that we receive
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             if(msg.what == 0) {
+                // Receive the bytes from the message
                 byte[] x = (byte[]) msg.obj;
                 ByteBuffer reader = ByteBuffer.wrap(x);
+
+                // Get the enemy ship location
                 final float shipX = reader.getFloat();
+
+                // Get the integer to check if they shot a bullet
                 int bullet = reader.getInt(8);
                 if (bullet == 1 && enemyShoot) {
+                    // Create and add the new enemy bullet to the list
                     enemyShoot = false;
                     ImageView v = new ImageView(activity);
                     Bullet shot = new Bullet(enemyShip.getX(), enemyShip.getY() + enemyShip.getHeightRadius(), v);
@@ -126,6 +144,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     enemyBullets.add(shot);
                     enemyTimerHandler.postDelayed(enemyTimer, 1000);
                 }
+                // Put the ship to the correct location
                 if (shipX > 0) {
                     ImageView shipView = enemyShip.image();
                     enemyShip.setX(shipX);
@@ -140,42 +159,42 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_screen);
 
+        // Get the overall app bluetooth socket and create our bluetooth connection from it
         GalacticBattleApp myApp = (GalacticBattleApp) getApplicationContext();
         connectionThread = new ConnectedThread(myApp.getSocket(), mHandler);
         connectionThread.start();
 
+        // Get the screen size so we know where to draw the ships
         Display mdisp = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         mdisp.getSize(size);
         maxX = size.x;
         maxY = size.y;
 
-        // Ship blink code
+        // Set the animation for a ship getting hit
         blinking.setDuration(500);
         blinking.setInterpolator(new LinearInterpolator());
         blinking.setRepeatCount(5);
         blinking.setRepeatMode(Animation.REVERSE);
 
+        //Create our two ship images and set their parameters
         ImageView myShipV = (ImageView) findViewById(R.id.myShip);
         ImageView enemyShipV = (ImageView) findViewById(R.id.enemyShip);
-
         myShipV.setLayoutParams(new RelativeLayout.LayoutParams((int)(maxX * 0.1) , (int)(maxX * .1)));
         enemyShipV.setLayoutParams(new RelativeLayout.LayoutParams((int)(maxX * 0.1) , (int)(maxX * .1)));
 
         myShip = new Spaceship((float)0.5, (float)1, myShipV);//middle of ship location
         enemyShip = new Spaceship((float)0.5, (float)0.05, enemyShipV);
 
+        // Set the image locations of the ship (they are different that the object's location)
         myShipV.setX(maxX * (myShip.getX() - myShip.getWidthRadius()));
         myShipV.setY(maxY * (myShip.getY() - myShip.getWidthRadius()));
         enemyShipV.setX(maxX * (enemyShip.getX() - enemyShip.getWidthRadius()));
         enemyShipV.setY(maxY * (enemyShip.getY() - enemyShip.getWidthRadius()));
 
-        System.out.println("SEARCH THIS: MY VIEW SHIP (x,y) = (" + myShipV.getX() + "," + myShipV.getY() + ")");
-        System.out.println("SEARCH THIS: ENEMY VIEW SHIP (x,y) = (" + enemyShipV.getX() + "," + enemyShipV.getY() + ")");
-
-        spaceInvaders = new ArrayList<SpaceInvader>();
+        // Set up our space invaders
+        spaceInvaders = new ArrayList<>();
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
         layout = (RelativeLayout) findViewById(R.id.layout);
 
         for (int i = 0; i < 8; i++) {
@@ -185,14 +204,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             currInvader.setLayoutParams(params);
             layout.addView(currInvader);
             SpaceInvader newInvader = new SpaceInvader((((float)i) / 8) + (float)0.07, (float) 0.5, currInvader, true);//0.07 is a magic number
+
+            // Add space invader to the list and put the image in the correct location
             spaceInvaders.add(newInvader);
-            //currInvader.layout((int) (maxX * newInvader.getX() + (maxX / 32)), (int) (maxY * newInvader.getY() + maxX / 20),
-            //        (int) (maxX * newInvader.getX() + (maxX * 3 / 32)), (int) (maxY * newInvader.getY() - maxX / 20));
             currInvader.setX((int)(maxX * (newInvader.getX() - newInvader.getWidthRadius())));
             currInvader.setY((int)(maxY * (newInvader.getY() - newInvader.getHeightRadius())));
             currInvader.requestLayout();
         }
 
+        // This gets the data from the options screen to set ship color and move sensitivity
         loadUserData();
 
 
@@ -201,6 +221,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
         decorView.setSystemUiVisibility(uiOptions);
 
+        // Hide the action bar because we do not need it
         ActionBar bar = getSupportActionBar();
         try {
             bar.hide();
@@ -208,12 +229,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
         }
 
+        // Set up the sensor manager for accelerometer to measure tilting for movement
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_GAME);
 
 
+        // This thread repeatedly runs to move bullets and calculate hit detection to check
+        // if any bullets have hit any ships or space invaders
         bulletLogic = new Thread() {
 
             @Override

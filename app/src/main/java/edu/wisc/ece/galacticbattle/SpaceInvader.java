@@ -88,7 +88,7 @@ public class SpaceInvader {
         */
     }
     public void moveRight() {
-        if (this.x <= 0.85)
+        if (this.x <= 0.95)
         {
             this.x = this.x + (float) 0.00025;
         }

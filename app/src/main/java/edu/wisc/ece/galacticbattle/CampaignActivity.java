@@ -32,6 +32,7 @@ import java.util.ArrayList;
 public class CampaignActivity extends AppCompatActivity implements SensorEventListener {
     public final static String EXTRA_OUTCOME = "com.example.galacticbattle.OUTCOME";
 
+    private CampaignActivity thisC = this;
     private Spaceship myShip;
     private ArrayList<SpaceInvader> spaceInvaders;
 
@@ -39,26 +40,42 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
     private int maxY;
     private int shipSpeed;
     private int level;
+    private int swapInvaders = 0;
 
     private SensorManager sensorManager;
+    private RelativeLayout gameLayout;
 
     private ArrayList<Bullet> bullets = new ArrayList<Bullet>();
     private ArrayList<Bullet> enemyBullets = new ArrayList<Bullet>();
 
     public boolean canShoot = true;
+    public boolean spaceInvaderShoot = true;
     public boolean invulnerable = false;
 
     private final Animation blinking = new AlphaAnimation(1, 0);
-    private Bullet [] myBulletsArray = new Bullet[10];
-    private Bullet [] myBulletsArray2 = new Bullet[10];
-    private Bullet [] enemyBulletsArray = new Bullet[10];
+    private Bullet [] myBulletsArray = new Bullet[20];
+    private Bullet [] myBulletsArray2 = new Bullet[20];
+    private Bullet [] enemyBulletsArray = new Bullet[20];
+    private Bullet [] enemyBulletsArray2 = new Bullet[20];
     private SpaceInvader [] spaceInvadersArray = new SpaceInvader[10];
+
+    private Thread spaceInvadersMove, bulletLogic;
+
     private final Handler timerHandler = new Handler();
     private final Runnable rTimer = new Runnable() {
         @Override
         public void run() {
             if (!canShoot)
                 canShoot = true;
+        }
+    };
+
+    private final Handler timerHandler_two = new Handler();
+    private final Runnable rTimer_two = new Runnable() {
+        @Override
+        public void run() {
+            if (!spaceInvaderShoot)
+                spaceInvaderShoot = true;
         }
     };
 
@@ -70,8 +87,6 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                 invulnerable = false;
         }
     };
-
-    private Thread spaceInvadersMove;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,10 +116,10 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
         blinking.setRepeatCount(5);
         blinking.setRepeatMode(Animation.REVERSE);
 
+        gameLayout = (RelativeLayout) findViewById(R.id.layoutC);
+
         spaceInvaders = new ArrayList<SpaceInvader>();
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        RelativeLayout gameLayout = (RelativeLayout) findViewById(R.id.layout);
 
         for (int i = 0; i < 8; i++) {
             ImageView currInvader = (ImageView) inflater.inflate(R.layout.space_invader_view, null);
@@ -133,7 +148,7 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_GAME);
 
-        Thread bulletLogic = new Thread() {
+        bulletLogic = new Thread() {
 
             @Override
             public void run() {
@@ -150,15 +165,25 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                                         ImageView movedImage = myBulletsArray[i].image();
                                         movedImage.setY((myBulletsArray[i].getY() - myBulletsArray[i].getHeightRadius()) * maxY);
                                         if (myBulletsArray[i].getY() < 0) {
-                                            RelativeLayout layout =
-                                                    (RelativeLayout) findViewById(R.id.layout);
-                                            layout.removeView(myBulletsArray[i].image());
+                                            gameLayout.removeView(myBulletsArray[i].image());
                                             bullets.remove(myBulletsArray[i]);
                                         }
-                                        shipHit();
-                                        enemyHit();
                                     }
                                 }
+                                enemyBullets.toArray(enemyBulletsArray2);
+                                for (int i = 0; i < enemyBulletsArray2.length; i++) {
+                                    if(enemyBulletsArray2[i] != null) {
+                                        enemyBulletsArray2[i].moveEnemy();
+                                        ImageView movedImage = enemyBulletsArray2[i].image();
+                                        movedImage.setY((enemyBulletsArray2[i].getY() - enemyBulletsArray2[i].getHeightRadius()) * maxY);
+                                        if (enemyBulletsArray2[i].getY() > 1) {
+                                            gameLayout.removeView(enemyBulletsArray2[i].image());
+                                            enemyBullets.remove(enemyBulletsArray2[i]);
+                                        }
+                                    }
+                                }
+                                shipHit();
+                                enemyHit();
                             }
                         });
                     }
@@ -172,6 +197,7 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
             @Override
             public void run() {
                 try {
+
                     while (true) {
                         Thread.sleep(1);
                         runOnUiThread(new Runnable() {
@@ -185,7 +211,7 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                                         if (spaceInvadersArray[i].getRight()) {
                                             spaceInvadersArray[i].moveRight();
                                             if (spaceInvadersArray[i].getRight()) {
-                                                movedImage.setX((spaceInvadersArray[i].getX() + spaceInvadersArray[i].getWidthRadius()) * maxX);
+                                                movedImage.setX((spaceInvadersArray[i].getX() - spaceInvadersArray[i].getWidthRadius()) * maxX);
                                             }
                                         } else {
                                             spaceInvadersArray[i].moveLeft();
@@ -193,9 +219,30 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                                                 movedImage.setX((spaceInvadersArray[i].getX() - spaceInvadersArray[i].getWidthRadius()) * maxX);
                                             }
                                         }
-                                        shipHit();
-                                        enemyHit();
+                                        if (spaceInvaderShoot && (i == swapInvaders)) {
+                                            spaceInvaderShoot = false;
+                                            ImageView v = new ImageView(thisC);
+                                            Bullet shot = new Bullet(spaceInvadersArray[i].getX(), spaceInvadersArray[i].getY(), v);
+                                            shot.setSource();
+                                            v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
+                                            v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
+
+                                            v.setLayoutParams(new RelativeLayout.LayoutParams((int) (shot.getWidthRadius() * 2 * maxX),
+                                                    (int) (shot.getHeightRadius() * 2 * maxY)));
+
+                                            gameLayout.addView(shot.image());
+                                            enemyBullets.add(shot);
+                                            timerHandler_two.postDelayed(rTimer_two, 1000);
+                                        }
                                     }
+                                }
+                                if(swapInvaders == 7)
+                                {
+                                    swapInvaders = 0;
+                                }
+                                else
+                                {
+                                    swapInvaders++;
                                 }
                             }
                         });
@@ -225,9 +272,7 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
 
                     v.setLayoutParams(new RelativeLayout.LayoutParams((int)(shot.getWidthRadius() * 2 * maxX),
                             (int)(shot.getHeightRadius()* 2 * maxY)));
-
-                    RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
-                    layout.addView(shot.image());
+                    gameLayout.addView(shot.image());
                     bullets.add(shot);
                     timerHandler.postDelayed(rTimer, 1000);
                 } else {
@@ -250,9 +295,7 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                 for (Bullet current : enemyBulletsArray) {
                     if (current != null) {
                         if (myShip.isHit(current)) {
-                            RelativeLayout layout =
-                                    (RelativeLayout) findViewById(R.id.layout);
-                            layout.removeView(current.image());
+                            gameLayout.removeView(current.image());
                             System.out.println("WE GOT HIT");
                             enemyBullets.remove(current);
                             if (!invulnerable) {
@@ -282,14 +325,12 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                     for (SpaceInvader invader : spaceInvadersArray) {
                         if (current != null && invader != null) {
                             if (invader.isHit(current)) {
-                                RelativeLayout layout =
-                                        (RelativeLayout) findViewById(R.id.layout);
-                                layout.removeView(current.image());
+                                gameLayout.removeView(current.image());
                                 System.out.println("HIT THE INVADER");
                                 bullets.remove(current);
                                 invader.hit();
                                 if (!invader.isAlive()) {
-                                    layout.removeView(invader.image());
+                                    gameLayout.removeView(invader.image());
                                     spaceInvaders.remove(invader);
                                 }
                             }
@@ -413,17 +454,19 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
     }
 
     public void endGame(String message) {
-        if (level == 1)
+        if (level == 1 && message.equals("WIN"))
         {
             spaceInvadersMove.interrupt();
             levelTwo();
         }
-        else if (level == 2) {
+        else if (level == 2 && message.equals("WIN")) {
             spaceInvadersMove.interrupt();
             levelThree();
         }
         else
         {
+            spaceInvadersMove.interrupt();
+            bulletLogic.interrupt();
             Intent intent = new Intent(this, EndScreenActivity.class);
             message = message + " campaign";
             intent.putExtra(EXTRA_OUTCOME, message);
@@ -436,7 +479,6 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
         spaceInvaders = new ArrayList<SpaceInvader>();
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        RelativeLayout gameLayout = (RelativeLayout) findViewById(R.id.layout);
         boolean right;
 
         for (int i = 0; i < 8; i++) {
@@ -478,7 +520,7 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                                         if (spaceInvadersArray[i].getRight()) {
                                             spaceInvadersArray[i].moveRight();
                                             if (spaceInvadersArray[i].getRight()) {
-                                                movedImage.setX((spaceInvadersArray[i].getX() + spaceInvadersArray[i].getWidthRadius()) * maxX);
+                                                movedImage.setX((spaceInvadersArray[i].getX() - spaceInvadersArray[i].getWidthRadius()) * maxX);
                                             }
                                         } else {
                                             spaceInvadersArray[i].moveLeft();
@@ -486,9 +528,30 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                                                 movedImage.setX((spaceInvadersArray[i].getX() - spaceInvadersArray[i].getWidthRadius()) * maxX);
                                             }
                                         }
-                                        shipHit();
-                                        enemyHit();
+                                        if (spaceInvaderShoot && (i == swapInvaders)) {
+                                            spaceInvaderShoot = false;
+                                            ImageView v = new ImageView(thisC);
+                                            Bullet shot = new Bullet(spaceInvadersArray[i].getX(), spaceInvadersArray[i].getY(), v);
+                                            shot.setSource();
+                                            v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
+                                            v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
+
+                                            v.setLayoutParams(new RelativeLayout.LayoutParams((int) (shot.getWidthRadius() * 2 * maxX),
+                                                    (int) (shot.getHeightRadius() * 2 * maxY)));
+
+                                            gameLayout.addView(shot.image());
+                                            enemyBullets.add(shot);
+                                            timerHandler_two.postDelayed(rTimer_two, 1000);
+                                        }
                                     }
+                                }
+                                if(swapInvaders == 7)
+                                {
+                                    swapInvaders = 0;
+                                }
+                                else
+                                {
+                                    swapInvaders++;
                                 }
                             }
                         });
@@ -505,7 +568,6 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
         spaceInvaders = new ArrayList<SpaceInvader>();
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        RelativeLayout gameLayout = (RelativeLayout) findViewById(R.id.layout);
         boolean right;
 
         for (int i = 0; i < 8; i++) {
@@ -543,12 +605,12 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                                 spaceInvaders.toArray(spaceInvadersArray);
                                 for (int i = 0; i < spaceInvadersArray.length; i++) {
                                     if (spaceInvadersArray[i] != null) {
-                                        if (i <= 2) {
+
                                             ImageView movedImage = spaceInvadersArray[i].image();
                                             if (spaceInvadersArray[i].getRight()) {
                                                 spaceInvadersArray[i].moveRight();
                                                 if (spaceInvadersArray[i].getRight()) {
-                                                    movedImage.setX((spaceInvadersArray[i].getX() + spaceInvadersArray[i].getWidthRadius()) * maxX);
+                                                    movedImage.setX((spaceInvadersArray[i].getX() - spaceInvadersArray[i].getWidthRadius()) * maxX);
                                                 }
                                             } else {
                                                 spaceInvadersArray[i].moveLeft();
@@ -556,25 +618,29 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
                                                     movedImage.setX((spaceInvadersArray[i].getX() - spaceInvadersArray[i].getWidthRadius()) * maxX);
                                                 }
                                             }
+                                        if (spaceInvaderShoot && (i == swapInvaders)) {
+                                            spaceInvaderShoot = false;
+                                            ImageView v = new ImageView(thisC);
+                                            Bullet shot = new Bullet(spaceInvadersArray[i].getX(), spaceInvadersArray[i].getY(), v);
+                                            shot.setSource();
+                                            v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
+                                            v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
+
+                                            v.setLayoutParams(new RelativeLayout.LayoutParams((int) (shot.getWidthRadius() * 2 * maxX),
+                                                    (int) (shot.getHeightRadius() * 2 * maxY)));
+                                            gameLayout.addView(shot.image());
+                                            enemyBullets.add(shot);
+                                            timerHandler_two.postDelayed(rTimer_two, 1000);
                                         }
-                                        else
-                                        {
-                                            ImageView movedImage = spaceInvadersArray[i].image();
-                                            if (!spaceInvadersArray[i].getRight()) {
-                                                spaceInvadersArray[i].moveLeft();
-                                                if (!spaceInvadersArray[i].getRight()) {
-                                                    movedImage.setX((spaceInvadersArray[i].getX() - spaceInvadersArray[i].getWidthRadius()) * maxX);
-                                                }
-                                            } else {
-                                                spaceInvadersArray[i].moveRight();
-                                                if (spaceInvadersArray[i].getRight()) {
-                                                    movedImage.setX((spaceInvadersArray[i].getX() + spaceInvadersArray[i].getWidthRadius()) * maxX);
-                                                }
-                                            }
-                                        }
-                                        shipHit();
-                                        enemyHit();
                                     }
+                                }
+                                if(swapInvaders == 7)
+                                {
+                                    swapInvaders = 0;
+                                }
+                                else
+                                {
+                                    swapInvaders++;
                                 }
                             }
                         });

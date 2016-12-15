@@ -31,10 +31,15 @@ public class ConnectedThread extends Thread {
         try {
             tmpIn = socket.getInputStream();
             tmpOut = socket.getOutputStream();
-        } catch (IOException e) { }
+        } catch (IOException e) {
+        }
 
         mmInStream = tmpIn;
         mmOutStream = tmpOut;
+    }
+
+    public void addActivityHandler(Handler handle) {
+        this.handle = handle;
     }
 
     public void run() {
@@ -46,10 +51,12 @@ public class ConnectedThread extends Thread {
             try {
                 // Read from the InputStream
                 bytes = mmInStream.read(buffer);
-                float shipX = ByteBuffer.wrap(buffer).getFloat();
-                // Send the obtained bytes to the UI activity
-                handle.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
-                        .sendToTarget();
+
+
+                    float shipX = ByteBuffer.wrap(buffer).getFloat();
+                    // Send the obtained bytes to the UI activity
+                    handle.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
+                            .sendToTarget();
             } catch (IOException e) {
                 break;
             }

@@ -58,6 +58,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     private Bullet current[] = new Bullet[20];
     private Bullet currentEnemy[] = new Bullet[20];
     private SpaceInvader invadersArray[] = new SpaceInvader[10];
+    private int counterWriteInt = 0;
 
     private final Animation blinking = new AlphaAnimation(1, 0);
 
@@ -66,12 +67,22 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     public boolean canShoot = true;
     public boolean invulnerable = false;
     public boolean enemyInvulnerable = false;
+    public boolean enemyShoot = true;
     private final Handler timerHandler = new Handler();
     private final Runnable rTimer = new Runnable() {
         @Override
         public void run() {
             if (!canShoot)
                 canShoot = true;
+        }
+    };
+
+    private final Handler enemyTimerHandler = new Handler();
+    private final Runnable enemyTimer = new Runnable() {
+        @Override
+        public void run() {
+            if (!enemyShoot)
+                enemyShoot = true;
         }
     };
 
@@ -100,7 +111,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             ByteBuffer reader = ByteBuffer.wrap(x);
             final float shipX = reader.getFloat();
             int bullet = reader.getInt(8);
-            if(bullet == 1) {
+            if(bullet == 1 && enemyShoot) {
+                enemyShoot = false;
                     ImageView v = new ImageView(activity);
                     Bullet shot = new Bullet(enemyShip.getX(), enemyShip.getY() + enemyShip.getHeightRadius(), v);
                         shot.setSource();
@@ -110,6 +122,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                 (int)(shot.getHeightRadius()* 2 * maxY)));
                         layout.addView(shot.image());
                     enemyBullets.add(shot);
+                    enemyTimerHandler.postDelayed(enemyTimer, 1000);
               }
               if(shipX > 0) {
                   ImageView shipView = enemyShip.image();
@@ -239,7 +252,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                             movedImage.setY((b.getY() - b.getHeightRadius())*maxY);
                                         }
                                     });
-                                    if (currentEnemy[i].getY() > maxY) {
+                                    if (currentEnemy[i].getY() > 1) {
                                         runOnUiThread(new Runnable() {
                                             @Override
                                             public void run() {
@@ -267,14 +280,18 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         countWrite++;
                         Thread.sleep(1);
                         if(countWrite % 10 == 0) {
+                            counterWriteInt++;
                             float value = 1 - myShip.getX();
                             byte[] location = ByteBuffer.allocate(8).putFloat(value).array();
                             for(int i = 0; i < 8; i++) {
                                 bytePacket[i] = location[i];
                             }
                             connectionThread.write(bytePacket);
-                            for(int i = 0; i < 4; i++) {
-                                bytePacket[i + 8] = 0;
+                            if(counterWriteInt == 5) {
+                                for (int i = 0; i < 4; i++) {
+                                    bytePacket[i + 8] = 0;
+                                    counterWriteInt = 0;
+                                }
                             }
                         }
                      }
@@ -296,6 +313,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             case (MotionEvent.ACTION_DOWN):
                 if (canShoot) {
                     canShoot = false;
+                    counterWriteInt = 0;
                     ImageView v = new ImageView(this);
                     Bullet shot = new Bullet(myShip.getX(), myShip.getY() - myShip.getHeightRadius(), v);
                     shot.setSource();

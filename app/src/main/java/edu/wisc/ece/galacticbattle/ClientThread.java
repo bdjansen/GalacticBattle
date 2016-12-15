@@ -9,6 +9,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.UUID;
+import android.os.Handler;
 
 /**
  * Created by Owner-PC on 11/7/2016.
@@ -17,12 +18,14 @@ public class ClientThread extends Thread {
     private final BluetoothSocket mmSocket;
     private final BluetoothDevice mmDevice;
     private final BluetoothAdapter mAdapter;
+    private final Handler connectionHandler;
 
-    public ClientThread(BluetoothDevice device) {
+    public ClientThread(BluetoothDevice device, Handler handle) {
         // Use a temporary object that is later assigned to mmSocket,
         // because mmSocket is final
         BluetoothSocket tmp = null;
         mmDevice = device;
+        connectionHandler = handle;
 
         mAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -58,6 +61,7 @@ public class ClientThread extends Thread {
 
         // Do work to manage the connection (in a separate thread)
         manageConnectedSocket();
+        connectionHandler.obtainMessage(0,0,-1,null).sendToTarget();
     }
 
     public BluetoothSocket getSocket()

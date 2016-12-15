@@ -8,12 +8,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.app.ListActivity;
 import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -26,6 +32,42 @@ public class FindPlayersActivity extends ListActivity {
     private ArrayList<String> FOLKS = new ArrayList<String>();
     private ClientThread client;
     private ServerThread server;
+    private ConnectedThread connection;
+    // private Button goButton = (Button) findViewById(R.id.GameButton);
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            Context context = getApplicationContext();
+            CharSequence text = "A player has linked up with you.  Game Starting in 2 seconds!";
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            receiveData.postDelayed(startGame, 1000);
+        }
+    };
+
+    private final Handler clientHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            Context context = getApplicationContext();
+            CharSequence text = "You linked up.  Game Starting in 2 seconds!";
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            receiveData.postDelayed(startGame, 1000);
+        }
+    };
+
+    private final Handler receiveData = new Handler();
+    private final Runnable startGame = new Runnable() {
+        @Override
+        public void run() {
+            Go(null);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +108,7 @@ public class FindPlayersActivity extends ListActivity {
         }
 
 
-        server = new ServerThread();
+        server = new ServerThread(clientHandler);
         server.start();
 
 
@@ -85,7 +127,7 @@ public class FindPlayersActivity extends ListActivity {
                 // Get the BluetoothDevice object
                 BluetoothDevice pickedDevice = mBluetoothAdapter.getRemoteDevice(address);
 
-                client = new ClientThread(pickedDevice);
+                client = new ClientThread(pickedDevice, mHandler);
                 client.start();
 
 

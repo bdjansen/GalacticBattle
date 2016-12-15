@@ -362,6 +362,33 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                             endGame("LOST");
                         }
                     }
+                    spaceInvaders.toArray(invadersArray);
+                    for (SpaceInvader invader : invadersArray) {
+                        if(invader == null)
+                            continue;
+                        if (invader.isHit(current)) {
+                            final Bullet b = current;
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    layout.removeView(b.image());
+                                }
+                            });
+                            System.out.println("HIT THE INVADER");
+                            bullets.remove(current);
+                            invader.hit();
+                            final SpaceInvader i = invader;
+                            if (!invader.isAlive()) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        layout.removeView(i.image());
+                                    }
+                                });
+                                spaceInvaders.remove(invader);
+                            }
+                        }
+                    }
                 }
     }
 

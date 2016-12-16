@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
@@ -182,10 +181,10 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         myShipV.setLayoutParams(new RelativeLayout.LayoutParams((int)(maxX * 0.1) , (int)(maxX * .1)));
         enemyShipV.setLayoutParams(new RelativeLayout.LayoutParams((int)(maxX * 0.1) , (int)(maxX * .1)));
 
-        myShip = new Spaceship((float)0.5, (float)0.95, myShipV);//middle of ship location
+        myShip = new Spaceship((float)0.5, (float)0.95, myShipV);
         enemyShip = new Spaceship((float)0.5, (float)0.05, enemyShipV);
 
-        // Set the image locations of the ship (they are different that the object's location)
+        // Set the image locations of the ship (they are different than the object's location)
         myShipV.setX(maxX * (myShip.getX() - myShip.getWidthRadius()));
         myShipV.setY(maxY * (myShip.getY() - myShip.getWidthRadius()));
         enemyShipV.setX(maxX * (enemyShip.getX() - enemyShip.getWidthRadius()));
@@ -203,6 +202,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             ViewGroup.LayoutParams params = new ViewGroup.LayoutParams((int)(maxX * 0.1), (int)(maxX * 0.1));
             currInvader.setLayoutParams(params);
             layout.addView(currInvader);
+
+            // The space invaders are set up in a straight horizontal line along the center of the screen
             SpaceInvader newInvader = new SpaceInvader((((float)i) / 8) + (float)0.07, (float) 0.5, currInvader, true);//0.07 is a magic number
 
             // Add space invader to the list and put the image in the correct location
@@ -268,7 +269,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
                         }
 
-                        // For each of our bullets, make them move, and if they go off-
+                        // For each of our enemies bullets, make them move, and if they go off-
                         // screen, remove them from the list
                         enemyBullets.toArray(currentEnemy);
                         for (int i = 0; i < currentEnemy.length; i++) {
@@ -294,7 +295,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                     }
                         }
 
-                        // Check to see if anything was hit by the bulelts
+                        // Check to see if anything was hit by the bullets
                         enemyHit();
                         shipHit();
                     }
@@ -403,7 +404,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     if (current == null)
                         continue;
 
-                    // We we get hit, start invulnerability and lose a life
+                    // When we get hit, start invulnerability and lose a life
                     if (myShip.isHit(current)) {
                         final Bullet b = current;
                         runOnUiThread(new Runnable() {
@@ -447,7 +448,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                             enemyBullets.remove(current);
                             invader.hit();
 
-                            // Destory the space invader if it dies
+                            // Destroy the space invader if it dies
                             final SpaceInvader i = invader;
                             if (!invader.isAlive()) {
                                 runOnUiThread(new Runnable() {
@@ -536,7 +537,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             x = -(x);
 
             // Case statement to set the speed of the ship depending on how far we are
-            // tilting the screen (taking into account the player's sensitivity perference)
+            // tilting the screen (taking into account the player's sensitivity preference)
             switch(shipSpeed){
                 case 1:
                     switch (x) {
@@ -707,7 +708,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         mKey = getString(R.string.preference_key_profile_speed);
         shipSpeed = mPrefs.getInt(mKey, 50);
 
-        // Get the user preferenced ship color
+        // Get the user preference for ship color
         switch (shipColor) {
             case 1:
                 myShip.setSource(R.drawable.spaceship);
@@ -723,7 +724,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 break;
         }
 
-        // Get the user preferenced ship sensitivity
+        // Get the user preference for ship sensitivity
         switch (shipSpeed / 25) {
             case 0:
                 shipSpeed = 1;
@@ -744,6 +745,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     // When we finish the game, we want to go to the end screen
     public void endGame(String message) {
         // Cancel the bluetooth and close all threads and destory them
+        connectionThread.cancel();
         connectionThread.interrupt();
         writeLogic.interrupt();
         bulletLogic.interrupt();
@@ -765,10 +767,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 
-
-    // We don't want to do anything during a backpress in the middle of the game
+    // We don't want to do anything during a back press in the middle of the game
     @Override
     public void onBackPressed() {
+        connectionThread.cancel();
+
+        super.onBackPressed();
     }
 
 }

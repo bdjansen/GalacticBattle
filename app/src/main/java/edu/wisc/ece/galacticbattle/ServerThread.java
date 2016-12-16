@@ -40,6 +40,7 @@ public class ServerThread extends Thread {
         mmServerSocket = tmp;
     }
 
+    // Get the connection from the client to run
     public void run() {
         socket = null;
         // Keep listening until exception occurs or a socket is returned

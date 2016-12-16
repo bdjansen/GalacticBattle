@@ -37,6 +37,7 @@ public class ClientThread extends Thread {
         mmSocket = tmp;
     }
 
+    // Send the connection to the server to connect
     public void run() {
         // Cancel discovery because it will slow down the connection
         mAdapter.cancelDiscovery();

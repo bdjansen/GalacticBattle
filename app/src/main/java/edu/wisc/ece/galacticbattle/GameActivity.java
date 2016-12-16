@@ -182,7 +182,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         myShipV.setLayoutParams(new RelativeLayout.LayoutParams((int)(maxX * 0.1) , (int)(maxX * .1)));
         enemyShipV.setLayoutParams(new RelativeLayout.LayoutParams((int)(maxX * 0.1) , (int)(maxX * .1)));
 
-        myShip = new Spaceship((float)0.5, (float)1, myShipV);//middle of ship location
+        myShip = new Spaceship((float)0.5, (float)0.95, myShipV);//middle of ship location
         enemyShip = new Spaceship((float)0.5, (float)0.05, enemyShipV);
 
         // Set the image locations of the ship (they are different that the object's location)
@@ -372,7 +372,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
                     // Create the bullet object and image to shoot
                     ImageView v = new ImageView(this);
-                    Bullet shot = new Bullet(myShip.getX(), myShip.getY() - myShip.getHeightRadius(), v);
+                    Bullet shot = new Bullet(myShip.getX(), myShip.getY() - myShip.getHeightRadius()
+                            - 0.0375f, v);
                     shot.setSource();
                     v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
                     v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
@@ -395,7 +396,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
-    // CHeck to see if our ship or space invaders got hit by any enemy bullets
+    // Check to see if our ship or space invaders got hit by any enemy bullets
     private void shipHit() {
                 enemyBullets.toArray(enemyBulletsArray);
                 for (Bullet current : enemyBulletsArray) {
@@ -443,7 +444,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                     layout.removeView(b.image());
                                 }
                             });
-                            bullets.remove(current);
+                            enemyBullets.remove(current);
                             invader.hit();
 
                             // Destory the space invader if it dies

@@ -6,19 +6,21 @@ import android.os.Handler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
-import java.nio.ByteBuffer;
 
 /**
  * Created by Owner-PC on 11/7/2016.
+ * This thread is used to continue the bluetooth connection in the game in order to send the
+ * ship location and bullet shooting information.  It cancels once the game is over.
  */
 public class ConnectedThread extends Thread {
+    // Socket and streams to send data over
     private final BluetoothSocket mmSocket;
     private final InputStream mmInStream;
     private final OutputStream mmOutStream;
-    private Handler handle;
+    // Handler in GameActivity to decide what to do once we get data
+    private final Handler handle;
+    // Channel to handle data over
     private final int MESSAGE_READ = 0;
-    private int getX;
 
     public ConnectedThread(BluetoothSocket socket, Handler handle) {
         mmSocket = socket;
@@ -38,13 +40,9 @@ public class ConnectedThread extends Thread {
         mmOutStream = tmpOut;
     }
 
-    public void addActivityHandler(Handler handle) {
-        this.handle = handle;
-    }
-
     public void run() {
         byte[] buffer = new byte[1024];  // buffer store for the stream, possibly shorten this
-        int bytes; // bytes returned from read()
+        int bytes; // amount of bytes returned from read()
 
         // Keep listening to the InputStream until an exception occurs
         while (true) {
@@ -52,8 +50,6 @@ public class ConnectedThread extends Thread {
                 // Read from the InputStream
                 bytes = mmInStream.read(buffer);
 
-
-                    float shipX = ByteBuffer.wrap(buffer).getFloat();
                     // Send the obtained bytes to the UI activity
                     handle.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
@@ -67,13 +63,17 @@ public class ConnectedThread extends Thread {
     public void write(byte[] bytes) {
         try {
             mmOutStream.write(bytes);
-        } catch (IOException e) { }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     /* Call this from the main activity to shutdown the connection */
     public void cancel() {
         try {
             mmSocket.close();
-        } catch (IOException e) { }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

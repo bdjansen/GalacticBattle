@@ -49,9 +49,8 @@ public class EndScreenActivity extends AppCompatActivity {
     }
 
     //@Override
-   // public void onBackPressed() {
-    //    goToHome();
-   // }
+    public void onBackPressed() {
+    }
 
     public void homeScreen(View v) {
         if (gameMode.equals("versus")) {
@@ -81,6 +80,7 @@ public class EndScreenActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // This restarts another game with the two people or the campaign again
     public void playAgain(View v) {
         Intent intent;
         if (gameMode.equals("campaign"))

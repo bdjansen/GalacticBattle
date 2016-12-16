@@ -744,7 +744,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     // When we finish the game, we want to go to the end screen
     public void endGame(String message) {
         // Cancel the bluetooth and close all threads and destory them
-        connectionThread.cancel();
         connectionThread.interrupt();
         writeLogic.interrupt();
         bulletLogic.interrupt();
@@ -770,9 +769,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     // We don't want to do anything during a backpress in the middle of the game
     @Override
     public void onBackPressed() {
-        connectionThread.cancel();
-
-        super.onBackPressed();
     }
 
 }

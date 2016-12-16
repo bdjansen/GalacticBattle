@@ -46,7 +46,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
     // These variables are used for bluetooth data
     private ConnectedThread connectionThread;
-    private gamePacket packet = new gamePacket();
     private byte[] bytePacket = new byte[1024];
     private int counterWriteInt = 0;
 
@@ -198,6 +197,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         layout = (RelativeLayout) findViewById(R.id.layout);
 
         for (int i = 0; i < 8; i++) {
+            // Set up the picture to the correct screen size
             ImageView currInvader = (ImageView) inflater.inflate(R.layout.space_invader_view, null);
             currInvader.setId(1000 + i);
             ViewGroup.LayoutParams params = new ViewGroup.LayoutParams((int)(maxX * 0.1), (int)(maxX * 0.1));
@@ -224,7 +224,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         // Hide the action bar because we do not need it
         ActionBar bar = getSupportActionBar();
         try {
-            bar.hide();
+            if(bar != null)
+                bar.hide();
         } catch (NullPointerException e) {
 
         }
@@ -243,19 +244,19 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void run() {
                 try {
-                    int counter = 0;
                     while (true) {
+                        // We want this to run every millisecond
                         Thread.sleep(1);
-                        counter++;
-                        final int threadCounter = counter;
-                                bullets.toArray(current);
-                                for (int i = 0; i < current.length; i++) {
-                                    if(current[i] == null)
-                                        continue;
-                                    current[i].move();
-                                    final ImageView movedImage = current[i].image();
-                                    final Bullet b = current[i];
-                                    runOnUiThread(new Runnable() {
+                        // For each of our bullets, make them move, and if they go off-
+                        // screen, remove them from the list
+                        bullets.toArray(current);
+                        for (int i = 0; i < current.length; i++) {
+                            if(current[i] == null)
+                                continue;
+                            current[i].move();
+                            final ImageView movedImage = current[i].image();
+                            final Bullet b = current[i];
+                            runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
                                             movedImage.setY((b.getY() - b.getHeightRadius())*maxY);
@@ -271,15 +272,18 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                         bullets.remove(current[i]);
                                     }
 
-                                }
-                                enemyBullets.toArray(currentEnemy);
-                                for (int i = 0; i < currentEnemy.length; i++) {
-                                    if(currentEnemy[i] == null)
-                                        continue;
-                                    currentEnemy[i].moveEnemy();
-                                    final ImageView movedImage = currentEnemy[i].image();
-                                    final Bullet b = currentEnemy[i];
-                                    runOnUiThread(new Runnable() {
+                        }
+
+                        // For each of our bullets, make them move, and if they go off-
+                        // screen, remove them from the list
+                        enemyBullets.toArray(currentEnemy);
+                        for (int i = 0; i < currentEnemy.length; i++) {
+                            if(currentEnemy[i] == null)
+                                continue;
+                            currentEnemy[i].moveEnemy();
+                            final ImageView movedImage = currentEnemy[i].image();
+                            final Bullet b = currentEnemy[i];
+                            runOnUiThread(new Runnable() {
                                         @Override
                                         public void run() {
                                             movedImage.setY((b.getY() - b.getHeightRadius())*maxY);
@@ -294,15 +298,19 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                         });
                                         enemyBullets.remove(currentEnemy[i]);
                                     }
-                                }
-                                    enemyHit();
-                                    shipHit();
+                        }
+
+                        // Check to see if anything was hit by the bulelts
+                        enemyHit();
+                        shipHit();
                     }
                 } catch (InterruptedException e) {
+                    System.out.println(e.getMessage());
                 }
             }
         };
 
+        // This is the logic used to send the bluetooth data to the other machine
         writeLogic = new Thread() {
 
             @Override
@@ -312,15 +320,24 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     while (true) {
                         countWrite++;
                         Thread.sleep(1);
+                        // We want to write every 10 milliseconds
                         if(countWrite % 10 == 0) {
                             counterWriteInt++;
+
+                            // Write and send the location of our ship
                             float value = 1 - myShip.getX();
                             byte[] location = ByteBuffer.allocate(8).putFloat(value).array();
                             for(int i = 0; i < 8; i++) {
                                 bytePacket[i] = location[i];
                             }
+
+                            // Send the data
                             connectionThread.write(bytePacket);
+
+                            // If a bullet is shot, we will write it 5 times so assure it sent
+                            // (We had some errors where it would not receive it)
                             if(counterWriteInt == 5) {
+                                // Clear the bullet shooting once we are done sending it
                                 for (int i = 0; i < 4; i++) {
                                     bytePacket[i + 8] = 0;
                                     counterWriteInt = 0;
@@ -329,6 +346,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                         }
                      }
                 } catch (InterruptedException e) {
+                    System.out.println(e.getMessage());
                 }
             }
         };
@@ -337,31 +355,39 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         writeLogic.start();
     }
 
+    // Our touch event is used to shoot bullets by tapping the screen
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
         int action = MotionEventCompat.getActionMasked(event);
 
         switch (action) {
+            // We want the action to be when we tap down, it shoots
             case (MotionEvent.ACTION_DOWN):
                 if (canShoot) {
                     canShoot = false;
+
+                    // Reset the bluetooth bullet send boolean
                     counterWriteInt = 0;
-                    ImageView v = new ImageView(this);
-                    Bullet shot = new Bullet(myShip.getX(), myShip.getY() - myShip.getHeightRadius(), v);
-                    shot.setSource();
-                    v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
-                    packet.setBulletX(shot.getX());
+
+                    // Set up the bluetooth variables to send bullet
                     byte[] location = ByteBuffer.allocate(4).putInt(1).array();
                     for(int i = 0; i < 4; i++) {
                         bytePacket[i + 8] = location[i];
                     }
-                    v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
 
+                    // Create the bullet object and image to shoot
+                    ImageView v = new ImageView(this);
+                    Bullet shot = new Bullet(myShip.getX(), myShip.getY() - myShip.getHeightRadius(), v);
+                    shot.setSource();
+                    v.setX((shot.getX() - shot.getWidthRadius()) * maxX);
+                    v.setY((shot.getY() - shot.getHeightRadius()) * maxY);
                     v.setLayoutParams(new RelativeLayout.LayoutParams((int)(shot.getWidthRadius() * 2 * maxX),
                             (int)(shot.getHeightRadius()* 2 * maxY)));
-
                     layout.addView(shot.image());
+
+                    // Add the bullet to shoot, and then set the timer for 1 second until
+                    // They can shoot again
                     bullets.add(shot);
                     timerHandler.postDelayed(rTimer, 1000);
                 } else {
@@ -375,14 +401,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
+    // CHeck to see if our ship or space invaders got hit by any enemy bullets
     private void shipHit() {
-
                 enemyBullets.toArray(enemyBulletsArray);
                 for (Bullet current : enemyBulletsArray) {
                     if (current == null)
                         continue;
-                    if (myShip.isHit(current)) {
 
+                    // We we get hit, start invulnerability and lose a life
+                    if (myShip.isHit(current)) {
                         final Bullet b = current;
                         runOnUiThread(new Runnable() {
                             @Override
@@ -402,10 +429,14 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                             invulnerable = true;
                             invulnerableHandler.postDelayed(rInvulnerable, 2500);
                         }
+
+                        // If we are out of lives, we lose the game
                         if(!myShip.isAlive()) {
                             endGame("LOST");
                         }
                     }
+
+                    // Check if any space invaders were hit by the bullets
                     spaceInvaders.toArray(invadersArray);
                     for (SpaceInvader invader : invadersArray) {
                         if(invader == null)
@@ -418,9 +449,10 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                     layout.removeView(b.image());
                                 }
                             });
-                            System.out.println("HIT THE INVADER");
                             bullets.remove(current);
                             invader.hit();
+
+                            // Destory the space invader if it dies
                             final SpaceInvader i = invader;
                             if (!invader.isAlive()) {
                                 runOnUiThread(new Runnable() {
@@ -436,15 +468,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 }
     }
 
+    // Check to see if the enemy or any space invader is hit by one of our bullets
     private void enemyHit() {
-
                 bullets.toArray(bulletsArray);
                 for (Bullet current : bulletsArray) {
                     if (current == null) {
                         continue;
                     }
+                    // Remove the bullet and mark the enemy as hit
                     if (enemyShip.isHit(current)) {
-
                         final Bullet b = current;
                         runOnUiThread(new Runnable() {
                             @Override
@@ -452,7 +484,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                 layout.removeView(b.image());
                             }
                         });
-                        System.out.println("HIT THE ENEMY");
                         bullets.remove(current);
                         if (!enemyInvulnerable) {
                             enemyShip.hit();
@@ -465,10 +496,12 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                             enemyInvulnerable = true;
                             eInvulnerableHandler.postDelayed(rEInvulnerable, 2500);
                         }
+                        // End the game if the enemy dies
                         if(!enemyShip.isAlive()) {
                             endGame("WON");
                         }
                     }
+                    // If a space invader is hit, kill the bullet and the space invader
                     spaceInvaders.toArray(invadersArray);
                     for (SpaceInvader invader : invadersArray) {
                         if(invader == null)
@@ -481,7 +514,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                                     layout.removeView(b.image());
                                 }
                             });
-                            System.out.println("HIT THE INVADER");
                             bullets.remove(current);
                             invader.hit();
                             final SpaceInvader i = invader;
@@ -499,6 +531,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 }
     }
 
+    // Use the accelerometer to allow the player to steer the ship to move back and forth
     @Override
     public void onSensorChanged(SensorEvent event) {
         float speed = 0;
@@ -507,6 +540,8 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
             int x = ((int) event.values[0]);
             x = -(x);
 
+            // Case statement to set the speed of the ship depending on how far we are
+            // tilting the screen (taking into account the player's sensitivity perference)
             switch(shipSpeed){
                 case 1:
                     switch (x) {
@@ -645,46 +680,15 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                     break;
             }
 
-            //hey
-            /*
-            switch (x) {
-                case -10:
-                case -9:
-                case -8:
-                case -7:
-                case -6:
-                case -5:
-                    speed = (float)0.001;
-                    break;
-                case -4:
-                case -3:
-                case -2:
-                case -1:
-                    speed = (float)0.0005;
-                    break;
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                    speed = (float)0.0005;
-                    break;
-                case 5:
-                case 6:
-                case 7:
-                case 8:
-                case 9:
-                case 10:
-                    speed = (float)0.001;
-                    break;
-            }
-            */
-
             ImageView shipView = myShip.image();
+
+            // Make sure we don't run into the right wall
             if (x > 0 && Math.abs(x) > 1) {
                 if (myShip.getX() < (1 - myShip.getWidthRadius())) {
                         myShip.setX(myShip.getX() + speed);
                         shipView.setX((myShip.getX() - myShip.getWidthRadius()) * maxX);
                 }
+                // Make sure we don't run into the left wall
             } else if (x <= 0 && Math.abs(x) > 1) {
                 if (myShip.getX() > myShip.getWidthRadius()) {
                         myShip.setX(myShip.getX() - speed );
@@ -694,6 +698,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+    // Put all of the user preferences from the options screen into the game
     private void loadUserData() {
         // Create the shared preferences variable so we can load in the data
         String mKey = getString(R.string.preference_name);
@@ -707,6 +712,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         mKey = getString(R.string.preference_key_profile_speed);
         shipSpeed = mPrefs.getInt(mKey, 50);
 
+        // Get the user preferenced ship color
         switch (shipColor) {
             case 1:
                 myShip.setSource(R.drawable.spaceship);
@@ -722,6 +728,7 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
                 break;
         }
 
+        // Get the user preferenced ship sensitivity
         switch (shipSpeed / 25) {
             case 0:
                 shipSpeed = 1;
@@ -738,10 +745,10 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         }
     }
 
+
+    // When we finish the game, we want to go to the end screen
     public void endGame(String message) {
-        Intent intent = new Intent(this, EndScreenActivity.class);
-        message = message + " versus";
-        intent.putExtra(EXTRA_OUTCOME, message);
+        // Cancel the bluetooth and close all threads and destory them
         connectionThread.cancel();
         connectionThread.interrupt();
         writeLogic.interrupt();
@@ -749,7 +756,14 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         connectionThread = null;
         writeLogic = null;
         bulletLogic = null;
+
+        // Stop listening to the accelerometer
         sensorManager.unregisterListener(this);
+
+        // Go to the ending screen
+        Intent intent = new Intent(this, EndScreenActivity.class);
+        message = message + " versus";
+        intent.putExtra(EXTRA_OUTCOME, message);
         startActivity(intent);
     }
 
@@ -758,15 +772,10 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
     }
 
 
+    // We don't want to do anything during a backpress in the middle of the game
     //@Override
     //public void onBackPressed() {
 
     //}
-    @Override
-    protected void onDestroy()
-    {
-        //
-        super.onDestroy();
-    }
 
 }

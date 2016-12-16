@@ -3,28 +3,23 @@ package edu.wisc.ece.galacticbattle;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
-import android.widget.Toast;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.UUID;
 import android.os.Handler;
 
 /**
  * Created by Owner-PC on 11/7/2016.
+ * This class is used by the user who requests to play a game.  This sends the request to the
+ * other player to start the bluetooth connection.
  */
 public class ClientThread extends Thread {
     private final BluetoothSocket mmSocket;
-    private final BluetoothDevice mmDevice;
     private final BluetoothAdapter mAdapter;
     private final Handler connectionHandler;
 
     public ClientThread(BluetoothDevice device, Handler handle) {
-        // Use a temporary object that is later assigned to mmSocket,
-        // because mmSocket is final
         BluetoothSocket tmp = null;
-        mmDevice = device;
         connectionHandler = handle;
 
         mAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -34,9 +29,11 @@ public class ClientThread extends Thread {
 
         // Get a BluetoothSocket to connect with the given BluetoothDevice
         try {
-            // MY_UUID is the app's UUID string, also used by the server code
+            // Create the socket from our uuid
             tmp = device.createInsecureRfcommSocketToServiceRecord(uuid);
-        } catch (IOException e) { }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
         mmSocket = tmp;
     }
 
@@ -47,19 +44,20 @@ public class ClientThread extends Thread {
         try {
             // Connect the device through the socket. This will block
             // until it succeeds or throws an exception
-            System.out.println("Go\n");
             mmSocket.connect();
         } catch (IOException connectException) {
             // Unable to connect; close the socket and get out
-            System.out.println("Canceled\n");
             System.out.println(connectException.getMessage());
             try {
                 mmSocket.close();
-            } catch (IOException closeException) { }
+            } catch (IOException closeException) {
+                System.out.println(closeException.getMessage());
+            }
             return;
         }
 
-        // Do work to manage the connection (in a separate thread)
+        // We connected!
+        // Send back to the find players screen that we have connected to the other player
         manageConnectedSocket();
         connectionHandler.obtainMessage(0,0,-1,null).sendToTarget();
     }
@@ -71,13 +69,15 @@ public class ClientThread extends Thread {
 
     private void manageConnectedSocket()
     {
-        System.out.println("YESSSS");
+        System.out.println("You connected as a client.");
     }
 
     /** Will cancel an in-progress connection, and close the socket */
     public void cancel() {
         try {
             mmSocket.close();
-        } catch (IOException e) { }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

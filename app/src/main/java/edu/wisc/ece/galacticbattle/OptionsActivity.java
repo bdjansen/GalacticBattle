@@ -10,6 +10,8 @@ import android.widget.SeekBar;
 
 /**
  * Created by Blake on 10/17/2016.
+ * This class gives the user the options to both set the color of their ship, and the sensitivity
+ * for movement when they tilt their phones. It uses UserPreferences to store the data.
  */
 
 public class OptionsActivity extends AppCompatActivity {
@@ -22,6 +24,7 @@ public class OptionsActivity extends AppCompatActivity {
 
     }
 
+    // Get their data for the items so that it loads in their current settings for them to change
     private void loadUserData() {
         // Create the shared preferences variable so we can load in the data
         String mKey = getString(R.string.preference_name);
@@ -45,11 +48,13 @@ public class OptionsActivity extends AppCompatActivity {
                 break;
         }
 
+        // We use a slider for them to choose how their speed goes
         SeekBar speedSlider = (SeekBar)findViewById(R.id.gameSpeedSlider);
         speedSlider.setMax(100);
         speedSlider.setProgress(shipSpeed);
     }
 
+    // If they click save, we want to write out these changes to use for later
     public void saveUserData(View v) {
         String mKey = getString(R.string.preference_name);
         SharedPreferences mPrefs = getSharedPreferences(mKey, MODE_PRIVATE);
@@ -73,6 +78,7 @@ public class OptionsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // If they hit cancel, we don't want to keep any of our changes
     public void cancelChanges(View v){
         Intent intent = new Intent(this, HomeScreen.class);
         startActivity(intent);

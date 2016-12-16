@@ -17,9 +17,9 @@ public class SpaceInvader {
     private float heightRadius;
     private int lives = 1;
     private boolean right;
+    private ImageView spaceInvader;
 
-    public ImageView spaceInvader;
-
+    // Constructor
     public SpaceInvader(float x, float y, ImageView v, boolean right) {
         this.x = x;
         this.y = y;

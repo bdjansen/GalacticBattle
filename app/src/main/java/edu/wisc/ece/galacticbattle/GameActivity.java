@@ -215,12 +215,6 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
         // This gets the data from the options screen to set ship color and move sensitivity
         loadUserData();
 
-
-        View decorView = getWindow().getDecorView();
-        // Hide the status bar.
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
-
         // Hide the action bar because we do not need it
         ActionBar bar = getSupportActionBar();
         try {

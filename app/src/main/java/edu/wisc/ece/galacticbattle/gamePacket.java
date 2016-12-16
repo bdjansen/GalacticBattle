@@ -2,6 +2,8 @@ package edu.wisc.ece.galacticbattle;
 
 /**
  * Created by Blake on 11/30/2016.
+ * UNUSED
+ * We originally created this file back when we started bluetooth, but ended up scrapping it
  */
 public class gamePacket implements java.io.Serializable {
     private float x = 0.5f;

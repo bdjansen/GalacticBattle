@@ -466,7 +466,9 @@ public class CampaignActivity extends AppCompatActivity implements SensorEventLi
         else
         {
             spaceInvadersMove.interrupt();
+            spaceInvadersMove = null;
             bulletLogic.interrupt();
+            bulletLogic = null;
             Intent intent = new Intent(this, EndScreenActivity.class);
             message = message + " campaign";
             intent.putExtra(EXTRA_OUTCOME, message);

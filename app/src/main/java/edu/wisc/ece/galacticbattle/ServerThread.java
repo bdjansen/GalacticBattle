@@ -21,6 +21,7 @@ public class ServerThread extends Thread {
     private BluetoothSocket socket;
     private final Handler connectionHandler;
 
+    // Constructor
     public ServerThread(Handler handle) {
         // Use a temporary object that is later assigned to mmServerSocket,
         // because mmServerSocket is final
@@ -36,7 +37,9 @@ public class ServerThread extends Thread {
         try {
             // MY_UUID is the app's UUID string, also used by the client code
             tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord("Galactic Battle", uuid);
-        } catch (IOException e) { }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
         mmServerSocket = tmp;
     }
 
@@ -62,7 +65,7 @@ public class ServerThread extends Thread {
 
     private void manageConnectedSocket()
     {
-        System.out.println("Server YESSS");
+        System.out.println("Server connected");
     }
 
     public BluetoothSocket getSocket()
@@ -74,6 +77,8 @@ public class ServerThread extends Thread {
     public void cancel() {
         try {
             mmServerSocket.close();
-        } catch (IOException e) { }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

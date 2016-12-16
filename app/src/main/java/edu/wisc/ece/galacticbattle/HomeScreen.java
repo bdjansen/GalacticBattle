@@ -20,24 +20,24 @@ public class HomeScreen extends AppCompatActivity {
         }
     }
 
+    public void campaign(View v) {
+        // Go to the campaign mode
+        Intent mIntent = new Intent(HomeScreen.this,
+                CampaignActivity.class);
+        startActivity(mIntent);
+    }
+
     public void searchPlayers(View v) {
-        // Go back to the main activity
+        // Go to the versus mode
         Intent mIntent = new Intent(HomeScreen.this,
                 FindPlayersActivity.class);
         startActivity(mIntent);
     }
 
     public void openOptions(View v) {
-        // Go back to the main activity
+        // Go to the game settings
         Intent mIntent = new Intent(HomeScreen.this,
                 OptionsActivity.class);
-        startActivity(mIntent);
-    }
-
-    public void campaign(View v) {
-        // Go back to the main activity
-        Intent mIntent = new Intent(HomeScreen.this,
-                CampaignActivity.class);
         startActivity(mIntent);
     }
 }

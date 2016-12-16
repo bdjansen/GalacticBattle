@@ -32,9 +32,8 @@ public class FindPlayersActivity extends ListActivity {
     private ArrayList<String> FOLKS = new ArrayList<String>();
     private ClientThread client;
     private ServerThread server;
-    private ConnectedThread connection;
-    // private Button goButton = (Button) findViewById(R.id.GameButton);
 
+    // This message gets returned from the server to say the game is starting
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -44,10 +43,11 @@ public class FindPlayersActivity extends ListActivity {
 
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
-            receiveData.postDelayed(startGame, 1000);
+            receiveData.postDelayed(startGame, 2000);
         }
     };
 
+    // This message gets returned from the client to say the game is starting
     private final Handler clientHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -57,9 +57,10 @@ public class FindPlayersActivity extends ListActivity {
 
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
-            receiveData.postDelayed(startGame, 1000);
+            receiveData.postDelayed(startGame, 2000);
         }
     };
+
 
     private final Handler receiveData = new Handler();
     private final Runnable startGame = new Runnable() {
@@ -107,12 +108,9 @@ public class FindPlayersActivity extends ListActivity {
             }
         }
 
-
+        // Start both threads as a server until a device chooses a server to request
         server = new ServerThread(clientHandler);
         server.start();
-
-
-
 
         // Define the listener interface
        AdapterView.OnItemClickListener mListener = new AdapterView.OnItemClickListener() {
@@ -127,6 +125,7 @@ public class FindPlayersActivity extends ListActivity {
                 // Get the BluetoothDevice object
                 BluetoothDevice pickedDevice = mBluetoothAdapter.getRemoteDevice(address);
 
+                // Make this device to client and send the request to the server
                 client = new ClientThread(pickedDevice, mHandler);
                 client.start();
 
@@ -140,14 +139,7 @@ public class FindPlayersActivity extends ListActivity {
     }
 
     public void Go(View v) {
-
-        //ConnectedThread connection;
-
-        // Go back to the main activity
-        Intent mIntent = new Intent(FindPlayersActivity.this,
-                GameActivity.class);
-
-
+        // Set the bluetooth socket for the game activity to use
         GalacticBattleApp myApp = (GalacticBattleApp)getApplicationContext();
         if (client != null && client.getSocket() != null)
         {
@@ -159,7 +151,9 @@ public class FindPlayersActivity extends ListActivity {
         }
 
 
-
+        // Go to the game activity
+        Intent mIntent = new Intent(FindPlayersActivity.this,
+                GameActivity.class);
         startActivity(mIntent);
     }
 

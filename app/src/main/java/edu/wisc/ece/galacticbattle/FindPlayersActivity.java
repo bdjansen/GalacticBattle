@@ -162,4 +162,19 @@ public class FindPlayersActivity extends ListActivity {
 
         startActivity(mIntent);
     }
+
+    // We don't want to do anything during a backpress in the middle of the game
+    @Override
+    public void onBackPressed() {
+        if (client != null && client.getSocket() != null)
+        {
+            client.cancel();
+        }
+        else if (server != null && server.getSocket() != null)
+        {
+            server.cancel();
+        }
+
+        super.onBackPressed();
+    }
 }

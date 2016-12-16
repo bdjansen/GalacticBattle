@@ -773,9 +773,11 @@ public class GameActivity extends AppCompatActivity implements SensorEventListen
 
 
     // We don't want to do anything during a backpress in the middle of the game
-    //@Override
-    //public void onBackPressed() {
+    @Override
+    public void onBackPressed() {
+        connectionThread.cancel();
 
-    //}
+        super.onBackPressed();
+    }
 
 }
